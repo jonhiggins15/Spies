@@ -1,0 +1,22 @@
+#Header{
+  font-family: fantasy;
+  color: white;
+  background-color: black;
+  padding-top: 50px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 100px;
+}
+
+#body{
+  background-color: black;
+}
+
+#testing{
+  color: white;
+  text-align: center;
+}
+
+#roomCreation{
+  padding-left: 150px;
+}
