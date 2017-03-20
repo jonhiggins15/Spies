@@ -1,0 +1,39 @@
+#Header{
+  font-family: fantasy;
+  color: white;
+  background-color: black;
+  padding-top: 50px;
+  text-align: center;
+  font-size: 100px;
+}
+
+#body{
+  background-color: black;
+}
+
+#testing{
+  color: white;
+  text-align: center;
+}
+
+#roomCreation{
+  text-align: center;
+  color: black;
+}
+
+#icon{
+  color: white;
+  transition: .5s;
+  outline: none;
+  background: transparent;
+  border: none;
+  position: fixed;
+  left: auto;
+  right: 0;
+  top: 12px;
+}
+
+#icon:hover{
+  color: black;
+  transition: .5s;
+}
