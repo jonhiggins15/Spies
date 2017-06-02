@@ -1,3 +1,15 @@
+*{
+  outline: none;
+}
+
+#loginText{
+  font-family: monospace;
+  color: white;
+  margin-top: 15px;
+  padding-left: 1415px;
+  position: fixed;
+}
+
 #Header{
   font-family: fantasy;
   color: white;
@@ -18,13 +30,22 @@
 
 #roomCreation{
   text-align: center;
-  color: black;
+  color: white;
 }
 
-#icon{
+#line{
+  color: white;
+  background: transparent;
+  border: none;
+  position: fixed;
+  margin-left: 1480px;
+  top: 15px;
+  z-index: 2;
+}
+
+#account{
   color: white;
   transition: .5s;
-  outline: none;
   background: transparent;
   border: none;
   position: fixed;
@@ -33,7 +54,20 @@
   top: 12px;
 }
 
-#icon:hover{
+#account:hover{
   color: black;
   transition: .5s;
+}
+
+#signOut{
+  right: 0;
+  left: auto;
+  position: fixed;
+  top: 12px;
+  display: none;
+}
+
+#signInError{
+  display: none;
+  color: white;
 }
