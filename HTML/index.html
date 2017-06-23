@@ -70,8 +70,8 @@
                            <div class="content registerBox" style="display:none;">
                             <div class="form">
                                <form method="post" html="{:multipart=>true}" data-remote="true" action="/register" accept-charset="UTF-8">
-                               <input id="email" class="form-control" type="text" placeholder="Email" name="email">
-                               <input id="password" class="form-control" type="password" placeholder="Password" name="password">
+                               <input id="emailForm" class="form-control" type="text" placeholder="Email" name="email">
+                               <input id="passwordForm" class="form-control" type="password" placeholder="Password" name="password">
                                <input id="password_confirmation" class="form-control" type="password" placeholder="Repeat Password" name="password_confirmation">
                                <input class="btn btn-default btn-register" value="Create account" id="signUpButton">
                                </form>
@@ -96,14 +96,37 @@
 </nav>
 
 <header>
-  <div id = "Header">Test</div>
+  <div id = "Header">SPIES</div>
 </header>
 
 <body id="body">
 
   <div id = "roomCreation">
-      <button id="roomButton" onclick="createGame()">Create Room</button>
+      <button id="roomButton" data-toggle="modal" data-target="#creationForm">Create Room</button>
+      <div id="creationForm" class="modal fade">
+        <div class="modal-content">
+          <div class="modal-header">Enter room name</div>
+          <div class="modal-body">
+            <input id="roomName" type="text"></input>
+            <button id="roomButton" onclick="createGame()">Create Room</button>
+          </div>
+        </div>
+      </div>
+
+      <p></p>
+      <button id="roomButton" data-toggle="modal" data-target="#gameList">Join Game</button>
+      <div id="gameList" class="modal fade">
+        <div class="modal-content">
+          <div class="modal-header">Open rooms</div>
+          <div class="modal-body">
+            <div id="gameList">
+              <ul></ul>
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
