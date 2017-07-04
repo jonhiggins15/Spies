@@ -4,7 +4,6 @@ var gameList;
 gameList = document.querySelector("#gameList ul");
 
 function createGame(){
-    console.log("testing");
     var user = firebase.auth().currentUser;
     var game = {
       host:{
@@ -13,7 +12,7 @@ function createGame(){
       },
     };
 
-    var key = ref.push();   //Creates the key used to identify the room
+    var key = ref.push();
     key.set(game, function(error){
       if(error){
         console.log("Error creating game", error);
@@ -23,18 +22,20 @@ function createGame(){
       }
     })
 
-    var joinName = $('#roomName').val();
+    var joinName = $('#roomName').val(); //Getting the room name throught JQuery
     var item = document.createElement("li");
     item.id = joinName;
-    item.innerHTML = '<button id = "gameList">' + 'Join ' + joinName + '</button>';
+    item.innerHTML = '<button id = "gameList">' + 'Join ' + joinName + '</button>'; //HTML for adding the game
     item.addEventListener("click", function() {
-      joinGame(joinName);
+      joinGame(key.key);
     });
-    gameList.appendChild(item);
+    gameList.appendChild(item);  //Adds the game button to the list
+
+    //window.location.href='createdGame.html';
 }
 
 function joinGame(key){
-  console.log("Joining game ", key);
+  console.log("Joining game", roomName);
   var user = firebase.auth().currentUser;
   ref.child(key).transaction(function(game){
     joiner = {
@@ -43,6 +44,4 @@ function joinGame(key){
     }
     return game;
   });
-
-
 }
