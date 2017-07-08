@@ -1,8 +1,29 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Room Created</title>
 </head>
 
+<body>
+  <h1 id="bigOne"></h1>
+  <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyBjxttr82927G5x1_C-MPvJRQMYKmQ4d3g",
+      authDomain: "spies-dcdf2.firebaseapp.com",
+      databaseURL: "https://spies-dcdf2.firebaseio.com",
+      projectId: "spies-dcdf2",
+      storageBucket: "spies-dcdf2.appspot.com",
+      messagingSenderId: "989041921995"
+    };
+    firebase.initializeApp(config);
+    var bigOne = document.getElementById('bigOne');
+    var dbRef = firebase.database().ref().child('rooms');
+    dbRef.on('value', snap => bigOne.innerText = snap.val());
+  </script>
+</body>
 
-Room test
+</html>
