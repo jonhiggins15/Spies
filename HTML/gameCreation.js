@@ -4,10 +4,13 @@ gameList = document.querySelector("#gameList ul");
 function createGame(){
     var user = firebase.auth().currentUser;
     var joinName = $('#roomName').val(); //Getting the room name throught JQuery
-
+    var userId = user.uid;
     firebase.database().ref('rooms/' + joinName).set({
-      hostuid: user.uid,
+      hostuid: userId,
       roomID: "roomID"
+    });
+    firebase.database().ref('rooms/'+joinName+'/players/'+userId).set({
+      character: "unassigned"
     });
 
     //TODO: I dont really know how or if this works, so im just leaving it commented out
@@ -21,16 +24,7 @@ function createGame(){
     //     key.onDisconnect().remove();
     //   }
     // })
-    var item = document.createElement("li");
-    var roomRef = firebase.database().ref().child('rooms');
-    gameListGen();
-    item.id = joinName;
-    item.innerHTML = '<button id = "gameList">' + 'Join ' + joinName + '</button>'; //HTML for adding the game
-    item.addEventListener("click", function() {
-      joinGame(key.key);
-    });
-    gameList.appendChild(item);  //Adds the game button to the list
-    window.location.href='createdGame.html';
+    window.location.href='main.html';
 }
 
 
@@ -69,7 +63,7 @@ function joinGame(){
     if(l.indexOf(input)<0){
       $('#nonexistingRoom').text("This room does not exist");
     }else{
-      window.location.href='createdGame.html';
+      window.location.href='main.html';
     }
   });
 }
