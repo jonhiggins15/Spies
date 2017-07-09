@@ -2,6 +2,13 @@
   outline: none;
 }
 
+#formInput{
+  color: black;
+}
+
+#nonexistingRoom{
+  color: white;
+}
 #loginText{
   font-family: monospace;
   color: white;

@@ -7,7 +7,7 @@
 </head>
 
 <body>
-  <h1 id="bigOne"></h1>
+  <h1 id="currRooms"></h1>
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
   <script>
     // Initialize Firebase
@@ -20,9 +20,22 @@
       messagingSenderId: "989041921995"
     };
     firebase.initializeApp(config);
-    var bigOne = document.getElementById('bigOne');
+    var allRooms = document.getElementById('allRooms');
+
+    //finds the room we're in by looping through all the rooms added until it
+    //reaches the one most recently added, then sets the currRooms text to that room
+    function findRooms(s) {
+      console.log(s);
+      for (x in s) {
+        console.log(x);
+        currRooms.innerText = JSON.stringify(x).substring(1, JSON.stringify(x).length - 1);
+      }
+    }
     var dbRef = firebase.database().ref().child('rooms');
-    dbRef.on('value', snap => bigOne.innerText = snap.val());
+    //everytime the pave loads, this calls findRooms
+    dbRef.once('value', function(snapshot) {
+      findRooms(snapshot.val());
+    });
   </script>
 </body>
 
