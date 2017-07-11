@@ -9,6 +9,7 @@ function createGame(){
       hostuid: userId,
       roomID: "roomID"
     });
+    alert(joinName+" "+userId);
     firebase.database().ref('rooms/'+joinName+'/players/'+userId).set({
       character: "unassigned"
     });
