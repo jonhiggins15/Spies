@@ -7,11 +7,12 @@ function createGame(){
     var userId = user.uid;
     firebase.database().ref('rooms/' + joinName).set({
       hostuid: userId,
-      roomID: "roomID"
+      roomName: joinName
     });
     alert(joinName+" "+userId);
     firebase.database().ref('rooms/'+joinName+'/players/'+userId).set({
-      character: "unassigned"
+      character: "unassigned",
+      uid: userId
     });
 
     //TODO: I dont really know how or if this works, so im just leaving it commented out
@@ -64,6 +65,8 @@ function joinGame(){
     if(l.indexOf(input)<0){
       $('#nonexistingRoom').text("This room does not exist");
     }else{
+      //TODO: Check if they are in the room, if they are not, add them
+      //make sure to use REST api, I don't think this will work with listeners
       window.location.href='main.html';
     }
   });
