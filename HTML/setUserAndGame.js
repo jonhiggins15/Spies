@@ -15,16 +15,20 @@ firebase.initializeApp(config);
 const auth = firebase.auth();
 var currUser;
 var uid;
-var tempRoom;
+var alias = "";
+var currRoom;
+var email;
 var dbRef = firebase.database().ref().child('rooms');
 
 auth.onAuthStateChanged(function(user){
   if (user && user != null) {
     uid = user.uid;
-    $('#currUser').text(user.email);
+    email = user.email;
+    $('#currUser').text(user.displayName);
     currUser = user;
   }else{
-    alert("no!");
+    alert("Please sign in first!");
+    window.location.href='index.html';
   }
   findRoom();
 });
@@ -38,74 +42,66 @@ function getJson(){
   xhttp.open("GET","https://spies-dcdf2.firebaseio.com/.json?print=pretty", false);
   xhttp.send();
   var response = JSON.parse(xhttp.responseText);
-  // alert(response.rooms.Test.hostuid);
   return response;
+}
+
+function setName(){
+  var alias = $('#aliasInput').val();
+  firebase.database().ref('rooms/'+currRoom+'/players/'+uid).update({
+    name: alias
+  });
+  updateAlias();
 }
 
 function findRoom(){
   all = getJson();
-  console.log(all);
-  console.log(all.rooms);
   for(i in all.rooms){
-    // alert(i);
     for(x in all.rooms[i].players){
-      // alert(currUser.uid+", "+x);
       if(currUser.uid == x){
-        $('#currRoom').text(i);
+        currRoom = i;
+        alias = all.rooms[i].players[currUser.uid].name;
+        $('#currRoom').text("Welcome, "+alias+" you are in room "+i);
       }
     }
   }
+  updateAlias();
+}
 
+//This function makes users pick an alias to identify them to other users
+function updateAlias(){
+  if (alias == email){
+    $('#currRoom').hide();
+    $('.nameInput').show();
+  }else{
+    $('.nameInput').hide();
+    $('#currRoom').show();
+  }
 }
 
 
+//TODO:this function is not working- sometimes returns undefined as a room even
+//though a valid room exists
+function findRoom(){
+  all = getJson();
+  for(i in all.rooms){
+    for(x in all.rooms[i].players){
+      alert(uid+", "+x);
+      if(uid == x){
+        return i;
+      }
+    }
+  }
+}
 
+function makeUserList(){
+  var all = getJson();
+  var room = findRoom();
+  alert(room);
+  for(x in all.rooms[room].players){
+    $('#playerList .list').append('<li>'+x.name+'</li>');
+  }
 
+}
+makeUserList();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// dbRef.once('value', function(snapshot) {
-//   findRooms(snapshot.val());
-// });
-//
-// function findRooms(s) {
-//   console.log(currUser.uid);
-//   for (x in s) {
-//     tempRoom = x;
-//     four = 5;
-//     var playerRef = firebase.database().ref().child('rooms/'+x+'/players/');
-//     alert("one");
-//     listener(playerRef);
-//     console.log(JSON.stringify(x).substring(1, JSON.stringify(x).length - 1));
-//     alert("three");
-//   }
-// }
-//
-// function listener(p){
-//   p.once('value',function(snapshot){
-//     alert("two");
-//     findPlayer(snapshot.val());
-//   });
-// }
-//
-// function findPlayer(snap){
-//   console.log(tempRoom);
-//   for(x in snap) {
-//     if(x == currUser.uid){
-//       $('#currRoom').text(tempRoom+", "+currUser.uid);
-//     }
-//   }
-// }
+updateAlias();

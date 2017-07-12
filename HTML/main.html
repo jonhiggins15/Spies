@@ -9,9 +9,19 @@
 <body>
   <h1 id="currRoom"></h1>
   <h1 id="currUser"></h1>
+  <div class="nameInput">
+    <form>
+      Alias:<br>
+      <input type="text" id="aliasInput"><br>
+      <button id="aliasSubmit" onclick="setName()">Submit</button>
+    </form>
+  </div>
+  <div id="playerList">
+    <ul style="none" class="list">
+    </ul>
+  </div>
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-  <script src="main.js"></script>
   <script src="DELETETHIS.js"></script>
   <script src="setUserAndGame.js"></script>
 </body>

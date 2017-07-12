@@ -1,18 +1,28 @@
 var ref = firebase.database().ref("/rooms");
 var STATE = {OPEN: 1, JOINED: 2, CLOSED: 3};
 gameList = document.querySelector("#gameList ul");
+var user;
+//need this function because if you put auth stuff outside a function,
+//it gets called right when the page loads which makes it not work
+function getUser(){
+  user = firebase.auth().currentUser;
+}
+
 function createGame(){
-    var user = firebase.auth().currentUser;
+    getUser();
     var joinName = $('#roomName').val(); //Getting the room name throught JQuery
     var userId = user.uid;
+    var userEmail = user.email;
     firebase.database().ref('rooms/' + joinName).set({
       hostuid: userId,
       roomName: joinName
     });
-    alert(joinName+" "+userId);
     firebase.database().ref('rooms/'+joinName+'/players/'+userId).set({
       character: "unassigned",
-      uid: userId
+      uid: userId,
+      name: userEmail,
+      isHost: true,
+      isAlive: true
     });
 
     //TODO: I dont really know how or if this works, so im just leaving it commented out
@@ -55,7 +65,19 @@ function listOfNames(s){
   return r;
 }
 
+function getJson(){
+  var xhttp = new XMLHttpRequest();
+
+  //TODO: IMPORTANT: before putting this on the website, change rules and put some
+  //form of authentication in the url
+  xhttp.open("GET","https://spies-dcdf2.firebaseio.com/.json?print=pretty", false);
+  xhttp.send();
+  var response = JSON.parse(xhttp.responseText);
+  return response;
+}
+
 function joinGame(){
+  getUser();
   var dbRef = firebase.database().ref().child('rooms');
   var l = [];
   var input = $('#joinGameTextfeild').val();
@@ -67,6 +89,23 @@ function joinGame(){
     }else{
       //TODO: Check if they are in the room, if they are not, add them
       //make sure to use REST api, I don't think this will work with listeners
+      var all = getJson();
+      console.log(all);
+      for(i in all.rooms[input].players){
+        if(user.uid == all.rooms[input].players[i].uid){
+          console.log("already member of room");
+        }else{
+          //didnt find player, add them to room
+          firebase.database().ref('rooms/'+input+'/players/'+user.uid).set({
+            character: "unassigned",
+            uid: user.uid,
+            name: user.email,
+            isHost: false,
+            isAlive: true
+          });
+        }
+      }
+
       window.location.href='main.html';
     }
   });

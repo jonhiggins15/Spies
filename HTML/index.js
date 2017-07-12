@@ -30,6 +30,7 @@ $('#signInButton').click(function(){
 $('#signUpButton').click(function(){
     var email = $('#emailForm').val();
     var password = $('#passwordForm').val();
+    var name = $('#nameForm').val();
     if(email != "" && password != ""){
       auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
         var errorCode = error.code;
