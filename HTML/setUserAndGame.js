@@ -49,6 +49,20 @@ function setName(){
   });
   updateAlias();
 }
+var stateRef = firebase.database().ref('rooms/'+currRoom+'/state');
+stateRef.on('value', function(snapshot){
+  alert(snapshot.val()+", "+currRoom);
+  if(snapshot.val()=="waiting"){
+    //show waiting elements
+    alert("waiting");
+    $('#waitingRoom').show();
+    $('#dayList').hide();
+  }else{
+    //hide waiting elements
+    $('#waitingRoom').hide();
+    $('#dayList').show();
+  }
+});
 
 function findRoom(){
   all = getJson();
@@ -100,12 +114,17 @@ function makeUserList(){
   var room = returnRoom();
   for(x in all.rooms[room].players){
     $('#playerList .list').append('<li>'+all.rooms[room].players[x].name+'</li>');
+    $('#dayList').append('<input type="radio" name="player">'+all.rooms[room].players[x].name);
+    $('#dayList').hide();
   }
   updateAlias();
 }
 
 function startGame(){
+  //TODO: this should set state of game to ongoing
   alert("starting game");
+  $('#waitingRoom').hide();
+  $('#dayList').show();
 }
 
 function signOut(){

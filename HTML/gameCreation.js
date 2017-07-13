@@ -10,12 +10,14 @@ function getUser(){
 
 function createGame(){
     getUser();
-    var joinName = $('#roomName').val(); //Getting the room name throught JQuery
+    var joinName = $('#roomName').val(); 
     var userId = user.uid;
     var userEmail = user.email;
     firebase.database().ref('rooms/' + joinName).set({
       hostuid: userId,
-      roomName: joinName
+      roomName: joinName,
+      //room state can be either waiting (if in waiting room) or ongoing
+      state: "waiting"
     });
     firebase.database().ref('rooms/'+joinName+'/players/'+userId).set({
       character: "unassigned",
@@ -86,8 +88,8 @@ function joinGame(){
     l = listOfNames(snapshot.val());
     if(l.indexOf(input)<0){
       $('#nonexistingRoom').text("This room does not exist");
-    }else{
-
+    }else{ //this else checks if a player is already in the room, and adds them
+      //if the user isn't
       var all = getJson();
       console.log(all);
       var found = false;
