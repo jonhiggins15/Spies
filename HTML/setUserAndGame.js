@@ -1,8 +1,3 @@
-//This file should be added to all HTML pages.  It initializes firebase, and finds the
-//username and the room and sets them
-
-//TODO: this could and should be drasticly simplified.  The whole temp thing is pretty sloppy
-
 var config = {
   apiKey: "AIzaSyBjxttr82927G5x1_C-MPvJRQMYKmQ4d3g",
   authDomain: "spies-dcdf2.firebaseapp.com",
@@ -15,9 +10,10 @@ firebase.initializeApp(config);
 const auth = firebase.auth();
 var currUser;
 var uid;
-var alias = "";
+var alias;
 var currRoom;
 var email;
+var isHost;
 var dbRef = firebase.database().ref().child('rooms');
 
 auth.onAuthStateChanged(function(user){
@@ -31,6 +27,7 @@ auth.onAuthStateChanged(function(user){
     window.location.href='index.html';
   }
   findRoom();
+  makeUserList();
 });
 
 //uses REST api to get the whole firebase database and make it an object, which is returned
@@ -60,6 +57,7 @@ function findRoom(){
       if(currUser.uid == x){
         currRoom = i;
         alias = all.rooms[i].players[currUser.uid].name;
+        isHost = all.rooms[i].players[currUser.uid].isHost;
         $('#currRoom').text("Welcome, "+alias+" you are in room "+i);
       }
     }
@@ -72,20 +70,24 @@ function updateAlias(){
   if (alias == email){
     $('#currRoom').hide();
     $('.nameInput').show();
+    $('#hostStartButton').hide();
   }else{
     $('.nameInput').hide();
     $('#currRoom').show();
+    //only the host should be able to start the game once everyone has joined,
+    //so this hides the button for all other users
+    if(isHost){
+      $('#hostStartButton').show();
+    }else{
+      $('#hostStartButton').hide();
+    }
   }
 }
 
-
-//TODO:this function is not working- sometimes returns undefined as a room even
-//though a valid room exists
-function findRoom(){
+function returnRoom(){
   all = getJson();
   for(i in all.rooms){
     for(x in all.rooms[i].players){
-      alert(uid+", "+x);
       if(uid == x){
         return i;
       }
@@ -95,13 +97,20 @@ function findRoom(){
 
 function makeUserList(){
   var all = getJson();
-  var room = findRoom();
-  alert(room);
+  var room = returnRoom();
   for(x in all.rooms[room].players){
-    $('#playerList .list').append('<li>'+x.name+'</li>');
+    $('#playerList .list').append('<li>'+all.rooms[room].players[x].name+'</li>');
   }
-
+  updateAlias();
 }
-makeUserList();
+
+function startGame(){
+  alert("starting game");
+}
+
+function signOut(){
+  alert("signOut");
+  firebase.auth().signOut();
+}
 
 updateAlias();

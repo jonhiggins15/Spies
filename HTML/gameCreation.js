@@ -87,23 +87,27 @@ function joinGame(){
     if(l.indexOf(input)<0){
       $('#nonexistingRoom').text("This room does not exist");
     }else{
-      //TODO: Check if they are in the room, if they are not, add them
-      //make sure to use REST api, I don't think this will work with listeners
+
       var all = getJson();
       console.log(all);
+      var found = false;
       for(i in all.rooms[input].players){
         if(user.uid == all.rooms[input].players[i].uid){
+          found = true;
+          alert("already member");
           console.log("already member of room");
-        }else{
-          //didnt find player, add them to room
-          firebase.database().ref('rooms/'+input+'/players/'+user.uid).set({
-            character: "unassigned",
-            uid: user.uid,
-            name: user.email,
-            isHost: false,
-            isAlive: true
-          });
         }
+      }
+      if(!found){
+        //didnt find player, add them to room
+        alert("BADBADNOTGOOD");
+        firebase.database().ref('rooms/'+input+'/players/'+user.uid).set({
+          character: "unassigned",
+          uid: user.uid,
+          name: user.email,
+          isHost: false,
+          isAlive: true
+        });
       }
 
       window.location.href='main.html';
