@@ -16,30 +16,85 @@ var email;
 var isHost;
 var dbRef = firebase.database().ref().child('rooms');
 
+// currUser = firebase.auth().currentUser;
+// uid = currUser.uid;
+// alert(uid);
+
+//everything is inside auth listener because all the code relies on knowing what
+//user is signed in
 auth.onAuthStateChanged(function(user){
+  //alert("auth");
   if (user && user != null) {
     uid = user.uid;
     email = user.email;
     $('#currUser').text(user.displayName);
     currUser = user;
   }else{
-    alert("Please sign in first!");
+    //alert("Please sign in first!");
     window.location.href='index.html';
   }
   findRoom();
   makeUserList();
+
+  function findRoom(){
+    all = getJson();
+    for(i in all.rooms){
+      for(x in all.rooms[i].players){
+        if(currUser.uid == x){
+          currRoom = i;
+          alias = all.rooms[i].players[currUser.uid].name;
+          isHost = all.rooms[i].players[currUser.uid].isHost;
+          $('#currRoom').text("Welcome, "+alias+" you are in room "+i);
+        }
+      }
+    }
+    updateAlias();
+  }
+
+
+
+  function makeUserList(){
+    var all = getJson();
+    var room = returnRoom();
+    for(x in all.rooms[room].players){
+      $('#playerList .list').append('<li>'+all.rooms[room].players[x].name+'</li>');
+      $('#dayList').append('<input type="radio" name="player">'+all.rooms[room].players[x].name);
+      $('#dayList').hide();
+    }
+    updateAlias();
+  }
+
+  updateAlias();
+
+  currRoom = returnRoom();
+  alert(currRoom);
+
+  var stateRef = firebase.database().ref('rooms/'+currRoom+'/state');
+  //alert("Room is now: "+currRoom);
+  stateRef.once('value', function(snapshot){
+    //alert(snapshot.val()+", "+currRoom);
+    if(snapshot.val()=="waiting"){
+      //show waiting elements
+      alert("waiting");
+      $('#waitingRoom').show();
+      $('#dayList').hide();
+    }else{
+      //hide waiting elements
+      $('#waitingRoom').hide();
+      $('#dayList').show();
+    }
+  });
+
 });
-
-//uses REST api to get the whole firebase database and make it an object, which is returned
-function getJson(){
-  var xhttp = new XMLHttpRequest();
-
-  //TODO: IMPORTANT: before putting this on the website, change rules and put some
-  //form of authentication in the url
-  xhttp.open("GET","https://spies-dcdf2.firebaseio.com/.json?print=pretty", false);
-  xhttp.send();
-  var response = JSON.parse(xhttp.responseText);
-  return response;
+function startGame(){
+  //TODO: this should set state of game to ongoing
+  var room = returnRoom();
+  firebase.database().ref('rooms/'+room).update({
+    state: "ongoing"
+  });
+  alert("starting game");
+  $('#waitingRoom').hide();
+  $('#dayList').show();
 }
 
 function setName(){
@@ -47,35 +102,6 @@ function setName(){
   firebase.database().ref('rooms/'+currRoom+'/players/'+uid).update({
     name: alias
   });
-  updateAlias();
-}
-var stateRef = firebase.database().ref('rooms/'+currRoom+'/state');
-stateRef.on('value', function(snapshot){
-  alert(snapshot.val()+", "+currRoom);
-  if(snapshot.val()=="waiting"){
-    //show waiting elements
-    alert("waiting");
-    $('#waitingRoom').show();
-    $('#dayList').hide();
-  }else{
-    //hide waiting elements
-    $('#waitingRoom').hide();
-    $('#dayList').show();
-  }
-});
-
-function findRoom(){
-  all = getJson();
-  for(i in all.rooms){
-    for(x in all.rooms[i].players){
-      if(currUser.uid == x){
-        currRoom = i;
-        alias = all.rooms[i].players[currUser.uid].name;
-        isHost = all.rooms[i].players[currUser.uid].isHost;
-        $('#currRoom').text("Welcome, "+alias+" you are in room "+i);
-      }
-    }
-  }
   updateAlias();
 }
 
@@ -100,31 +126,30 @@ function updateAlias(){
 
 function returnRoom(){
   all = getJson();
+  //alert(1);
   for(i in all.rooms){
+    //alert(2);
+    //alert(uid);
     for(x in all.rooms[i].players){
+      //alert(uid+", "+x);
       if(uid == x){
+        //alert("Room is: "+i);
         return i;
       }
     }
   }
+  alert("BAD!!!!!");
 }
 
-function makeUserList(){
-  var all = getJson();
-  var room = returnRoom();
-  for(x in all.rooms[room].players){
-    $('#playerList .list').append('<li>'+all.rooms[room].players[x].name+'</li>');
-    $('#dayList').append('<input type="radio" name="player">'+all.rooms[room].players[x].name);
-    $('#dayList').hide();
-  }
-  updateAlias();
-}
+function getJson(){
+  var xhttp = new XMLHttpRequest();
 
-function startGame(){
-  //TODO: this should set state of game to ongoing
-  alert("starting game");
-  $('#waitingRoom').hide();
-  $('#dayList').show();
+  //TODO: IMPORTANT: before putting this on the website, change rules and put some
+  //form of authentication in the url
+  xhttp.open("GET","https://spies-dcdf2.firebaseio.com/.json?print=pretty", false);
+  xhttp.send();
+  var response = JSON.parse(xhttp.responseText);
+  return response;
 }
 
 function signOut(){
@@ -132,4 +157,7 @@ function signOut(){
   firebase.auth().signOut();
 }
 
-updateAlias();
+
+
+
+//uses REST api to get the whole firebase database and make it an object, which is returned
