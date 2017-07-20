@@ -16,21 +16,15 @@ var email;
 var isHost;
 var dbRef = firebase.database().ref().child('rooms');
 
-// currUser = firebase.auth().currentUser;
-// uid = currUser.uid;
-// alert(uid);
-
 //everything is inside auth listener because all the code relies on knowing what
 //user is signed in
 auth.onAuthStateChanged(function(user){
-  //alert("auth");
   if (user && user != null) {
     uid = user.uid;
     email = user.email;
     $('#currUser').text(user.displayName);
     currUser = user;
   }else{
-    //alert("Please sign in first!");
     window.location.href='index.html';
   }
   findRoom();
@@ -56,9 +50,10 @@ auth.onAuthStateChanged(function(user){
   function makeUserList(){
     var all = getJson();
     var room = returnRoom();
+    $('#dayList').empty();
     for(x in all.rooms[room].players){
       $('#playerList .list').append('<li>'+all.rooms[room].players[x].name+'</li>');
-      $('#dayList').append('<input type="radio" name="player">'+all.rooms[room].players[x].name);
+      $('#dayList').append('<input type="radio" name="player" onclick="vote(this.value)" value='+all.rooms[room].players[x].uid+'>'+all.rooms[room].players[x].name);
       $('#dayList').hide();
     }
     updateAlias();
@@ -70,12 +65,8 @@ auth.onAuthStateChanged(function(user){
   alert(currRoom);
 
   var stateRef = firebase.database().ref('rooms/'+currRoom+'/state');
-  //alert("Room is now: "+currRoom);
   stateRef.once('value', function(snapshot){
-    //alert(snapshot.val()+", "+currRoom);
     if(snapshot.val()=="waiting"){
-      //show waiting elements
-      alert("waiting");
       $('#waitingRoom').show();
       $('#dayList').hide();
     }else{
@@ -126,14 +117,9 @@ function updateAlias(){
 
 function returnRoom(){
   all = getJson();
-  //alert(1);
   for(i in all.rooms){
-    //alert(2);
-    //alert(uid);
     for(x in all.rooms[i].players){
-      //alert(uid+", "+x);
       if(uid == x){
-        //alert("Room is: "+i);
         return i;
       }
     }
@@ -155,6 +141,13 @@ function getJson(){
 function signOut(){
   alert("signOut");
   firebase.auth().signOut();
+}
+
+function vote(user){
+  alert(user);
+  firebase.database().ref('rooms/'+currRoom+'/players/'+uid).update({
+    dayKillVote: user
+  });
 }
 
 

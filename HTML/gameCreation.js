@@ -10,7 +10,7 @@ function getUser(){
 
 function createGame(){
     getUser();
-    var joinName = $('#roomName').val(); 
+    var joinName = $('#roomName').val();
     var userId = user.uid;
     var userEmail = user.email;
     firebase.database().ref('rooms/' + joinName).set({
@@ -24,7 +24,8 @@ function createGame(){
       uid: userId,
       name: userEmail,
       isHost: true,
-      isAlive: true
+      isAlive: true,
+      dayKillVote: "none"
     });
 
     //TODO: I dont really know how or if this works, so im just leaving it commented out
@@ -82,15 +83,16 @@ function joinGame(){
   getUser();
   var dbRef = firebase.database().ref().child('rooms');
   var l = [];
-  var input = $('#joinGameTextfeild').val();
-  console.log('input: '+input);
+  var input = $('#joinGameTextfield').val();
+  var all = getJson();
   dbRef.on('value', function(snapshot){
     l = listOfNames(snapshot.val());
     if(l.indexOf(input)<0){
+      console.log(l.indexOf(input));
+
       $('#nonexistingRoom').text("This room does not exist");
     }else{ //this else checks if a player is already in the room, and adds them
       //if the user isn't
-      var all = getJson();
       console.log(all);
       var found = false;
       for(i in all.rooms[input].players){
@@ -98,21 +100,28 @@ function joinGame(){
           found = true;
           alert("already member");
           console.log("already member of room");
+          window.location.href='main.html';
         }
       }
       if(!found){
         //didnt find player, add them to room
-        alert("BADBADNOTGOOD");
-        firebase.database().ref('rooms/'+input+'/players/'+user.uid).set({
-          character: "unassigned",
-          uid: user.uid,
-          name: user.email,
-          isHost: false,
-          isAlive: true
-        });
+        if(all.rooms[input].state == "waiting"){
+          firebase.database().ref('rooms/'+input+'/players/'+user.uid).set({
+            character: "unassigned",
+            uid: user.uid,
+            name: user.email,
+            isHost: false,
+            isAlive: true,
+            dayKillVote: "none"
+          });
+          window.location.href='main.html';
+        }else{
+          $('#nonexistingRoom').text("Can't join a room when the game is in session");
+        }
+
       }
 
-      window.location.href='main.html';
+
     }
   });
 }
