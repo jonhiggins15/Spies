@@ -1,3 +1,12 @@
+/*TODO:
+  -Sometimes the auth listener just runs for no reason -> messes with whats hidden and whats there
+  -Now it refreshes whole page when new dial is selected. Listeners arn't working but that would be a lot cleaner
+  -after page refreshes, the radio button is empty -> should show who you voted for
+  -time based on host's timezone instead of each user
+  -assign character to game and give them their abilities
+   */
+
+
 var config = {
   apiKey: "AIzaSyBjxttr82927G5x1_C-MPvJRQMYKmQ4d3g",
   authDomain: "spies-dcdf2.firebaseapp.com",
@@ -15,9 +24,12 @@ var currRoom;
 var email;
 var isHost;
 var dbRef = firebase.database().ref().child('rooms');
-
+var locked = true;
 //everything is inside auth listener because all the code relies on knowing what
 //user is signed in
+
+$('#waitingRoom').hide();  //TODO: This might not work when a new game is created
+
 auth.onAuthStateChanged(function(user){
   if (user && user != null) {
     uid = user.uid;
@@ -29,54 +41,92 @@ auth.onAuthStateChanged(function(user){
   }
   findRoom();
   makeUserList();
-
-  function findRoom(){
-    all = getJson();
-    for(i in all.rooms){
-      for(x in all.rooms[i].players){
-        if(currUser.uid == x){
-          currRoom = i;
-          alias = all.rooms[i].players[currUser.uid].name;
-          isHost = all.rooms[i].players[currUser.uid].isHost;
-          $('#currRoom').text("Welcome, "+alias+" you are in room "+i);
-        }
-      }
-    }
-    updateAlias();
-  }
-
-
-
-  function makeUserList(){
-    var all = getJson();
-    var room = returnRoom();
-    $('#dayList').empty();
-    for(x in all.rooms[room].players){
-      $('#playerList .list').append('<li>'+all.rooms[room].players[x].name+'</li>');
-      $('#dayList').append('<input type="radio" name="player" onclick="vote(this.value)" value='+all.rooms[room].players[x].uid+'>'+all.rooms[room].players[x].name);
-      $('#dayList').hide();
-    }
-    updateAlias();
-  }
-
   updateAlias();
 
   currRoom = returnRoom();
-  alert(currRoom);
+  locked = false;
 
-  var stateRef = firebase.database().ref('rooms/'+currRoom+'/state');
-  stateRef.once('value', function(snapshot){
-    if(snapshot.val()=="waiting"){
+});
+
+var stateRef = firebase.database().ref('rooms/' + currRoom + '/state');
+stateRef.on('value', function(snapshot) {
+  //needs this lock otherwise it will run this listener before the auth one
+  if (!locked) {
+    if (snapshot.val() == "waiting") {
       $('#waitingRoom').show();
       $('#dayList').hide();
-    }else{
+    } else {
       //hide waiting elements
       $('#waitingRoom').hide();
       $('#dayList').show();
     }
-  });
-
+  }
 });
+
+firebase.database().ref('rooms/'+currRoom+'/players').on('value',function(snapshot){
+  if (!locked) {
+    if (snapshot.val() == "waiting") {
+      $('#waitingRoom').show();
+      $('#dayList').hide();
+    } else {
+      //hide waiting elements
+      $('#waitingRoom').hide();
+      $('#dayList').show();
+    }
+  }
+});
+
+
+function findRoom(){
+  all = getJson();
+  for(i in all.rooms){
+    for(x in all.rooms[i].players){
+      if(currUser.uid == x){
+        currRoom = i;
+        alias = all.rooms[i].players[currUser.uid].name;
+        isHost = all.rooms[i].players[currUser.uid].isHost;
+        $('#currRoom').text("Welcome, "+alias+" you are in room "+i);
+      }
+    }
+  }
+  updateAlias();
+}
+function makeUserList(){
+  var all = getJson();
+  var room = returnRoom();
+  var d = makeVoteList();
+  $('#dayListNames').empty();
+  for(x in all.rooms[room].players){
+    var votes;
+    if(d[all.rooms[room].players[x].uid] == null){
+      votes = 0;
+    }else{
+      votes = d[all.rooms[room].players[x].uid];
+    }
+    $('#playerList .list').append('<li>'+all.rooms[room].players[x].name+'</li>');
+    $('#dayListNames').append('<input type="radio" name="player" onclick="vote(this.value)" value='+all.rooms[room].players[x].uid+'>'+all.rooms[room].players[x].name+" "+votes);
+    $('#dayList').hide();
+  }
+  updateAlias();
+}
+
+function makeVoteList(){
+  var all = getJson();
+  var dict = {};
+  var room = returnRoom();
+  for(x in all.rooms[room].players){
+    var kill = all.rooms[room].players[x].dayKillVote;
+    if(dict[kill] == null){
+      dict[kill] = 1;
+    }else{
+      dict[kill] = dict[kill]+1;
+    }
+
+  }
+  console.log(dict);
+  return dict;
+}
+
 function startGame(){
   //TODO: this should set state of game to ongoing
   var room = returnRoom();
@@ -86,6 +136,7 @@ function startGame(){
   alert("starting game");
   $('#waitingRoom').hide();
   $('#dayList').show();
+
 }
 
 function setName(){
@@ -103,6 +154,11 @@ function updateAlias(){
     $('.nameInput').show();
     $('#hostStartButton').hide();
   }else{
+    var time = new Date();
+    if(time.getHours()<5 || time.getHours()>17){
+      alert("night");
+      window.location.href='main.html';
+    }
     $('.nameInput').hide();
     $('#currRoom').show();
     //only the host should be able to start the game once everyone has joined,
@@ -144,10 +200,10 @@ function signOut(){
 }
 
 function vote(user){
-  alert(user);
   firebase.database().ref('rooms/'+currRoom+'/players/'+uid).update({
     dayKillVote: user
   });
+  location.reload();
 }
 
 
