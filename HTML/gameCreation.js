@@ -7,7 +7,31 @@ var user;
 function getUser(){
   user = firebase.auth().currentUser;
 }
+/*FIREBASE DATABASE DOCS:
+    hostuid: user id of the room's creater
 
+    players: list of all players by their user id's
+
+    dayKillVote: the uid of the player the player that is being
+      referenced voted to kill. "none" means they have not voted.
+
+    isAlive: True if alive, false if dead
+
+    isHost: true if referenced player created the referenced room
+
+    name: chosen alias, just their email if they dont choose
+
+    role: the character they play in the game. eg hacker, spy ...
+
+    uid: their user id.  Needed bacause we can't reference parent
+      nodes in the database
+
+    roomName: Rooms name. Needed for the same reason as above
+    
+    state: ongoing if a game is in progress and waiting if the game is
+      created but the host still needs to start it.  If you get a null value
+      for this, use the REST API instead of the firebase listener
+*/
 function createGame(){
     getUser();
     var joinName = $('#roomName').val();
@@ -20,12 +44,14 @@ function createGame(){
       state: "waiting"
     });
     firebase.database().ref('rooms/'+joinName+'/players/'+userId).set({
-      character: "unassigned",
+      role: "unassigned",
       uid: userId,
       name: userEmail,
       isHost: true,
       isAlive: true,
-      dayKillVote: "none"
+      dayKillVote: "none",
+      usedAbility: true,
+      guarded: false
     });
 
     //TODO: I dont really know how or if this works, so im just leaving it commented out
@@ -107,12 +133,14 @@ function joinGame(){
         //didnt find player, add them to room
         if(all.rooms[input].state == "waiting"){
           firebase.database().ref('rooms/'+input+'/players/'+user.uid).set({
-            character: "unassigned",
+            role: "unassigned",
             uid: user.uid,
             name: user.email,
             isHost: false,
             isAlive: true,
-            dayKillVote: "none"
+            dayKillVote: "none",
+            usedAbility: true,
+            guarded: false
           });
           window.location.href='main.html';
         }else{
