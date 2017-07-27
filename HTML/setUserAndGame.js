@@ -3,10 +3,11 @@
   -Now it refreshes whole page when new dial is selected. Listeners arn't working but that would be a lot cleaner
   -after page refreshes, the radio button is empty -> should show who you voted for
   -time based on host's timezone instead of each user
-  -assign character to game and give them their abilities
   -optimize jquerry calls -> sometimes I call one after another which is bad for speed and data caps
   -in index.html you teh login button doesnt work on thin screens
   -login button should close module (also index.html)
+  -in testing, when I first started the game, name on screen was unassigned but when the screen was refreshed,
+    it changed
    */
 
 
@@ -28,6 +29,7 @@ var email;
 var isHost;
 var dbRef = firebase.database().ref().child('rooms');
 var locked = true;
+var rand = ["matchmaker", "deadMansHand", "burglar"];
 //everything is inside auth listener because all the code relies on knowing what
 //user is signed in
 
@@ -117,7 +119,13 @@ function makeUserList() {
       votes = d[all.rooms[room].players[x].uid];
     }
     $('#playerList .list').append('<li>' + all.rooms[room].players[x].name + '</li>');
-    $('#dayListNames').append('<input type="radio" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+    //see who the player voted for
+    var currVote = all.rooms[room].players[uid].dayKillVote;
+    if(currVote == all.rooms[room].players[x].uid){
+      $('#dayListNames').append('<input type="radio" checked="true" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+    }else{
+      $('#dayListNames').append('<input type="radio" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+    }
     $('#dayList').hide();
   }
   updateAlias();
@@ -144,6 +152,11 @@ function changeRole(role, uid) {
   //role is a string of what the player's role is
   var all = getJson();
   var room = returnRoom();
+  var a = shuffle(rand);
+  if(role == "random"){
+    role = a.pop();
+    alert(role);
+  }
   if (role == "civ" || role == "spy" || role == "deadMansHand") {
     //for civ, spy, deadMansHand nothing needs to be updated besides role
     firebase.database().ref('rooms/' + room + '/players/' + uid).update({
@@ -157,6 +170,25 @@ function changeRole(role, uid) {
     });
   }
 
+}
+
+function checkEndGame(){
+  var all = getJson();
+  var room = returnRoom();
+  var spyNum = 0;
+  var agentsNum = 0;
+  for (x in all.rooms[room].players) {
+    if(all.rooms[room].players[x].role == "spy"){
+      spyNum++;
+    }else{
+      agentsNum++;
+    }
+  }
+  if(spyNum > agentsNum){
+    alert("Spies Win!!");
+  }else if(spyNum == 0){
+    alert("Agents Win!!");
+  }
 }
 
 
@@ -258,7 +290,6 @@ function inGameView() {
 //This function makes users pick an alias to identify them to other users
 function updateAlias() {
   if (alias == email) {
-    alert("alias");
     needAliasView();
   } else {
     startView();
@@ -268,7 +299,7 @@ function updateAlias() {
     var votes = 0;
     $('#role').text(all.rooms[room].players[uid].role);
     var time = new Date();
-    if (time.getHours() < 5 || time.getHours() > 15) {
+    if (time.getHours() < 5 || time.getHours() > 15 || false) {
       var dict = {};
       for (x in all.rooms[room].players) {
         var kill = all.rooms[room].players[x].dayKillVote;
@@ -286,12 +317,20 @@ function updateAlias() {
           }
         }
       }
-        alert(killName);
-        firebase.database().ref('rooms/' + room + '/players/' + killName).update({
-          isAlive: false
+      alert(killName);
+      var roomRef = firebase.database().ref('rooms/' + room + '/players/'+killName);
+      roomRef.remove()
+        .then(function(){
+          console.log("sucess");
+        })
+        .catch(function(error) {
+          console.log("Remove failed: " + error.message)
         });
-        alert("change to night");
-        //window.location.href='night.html';
+
+      alert("change to night");
+      //for whatever reason, doesnt work when redirected, but works like this
+      // window.location.href='night.html';
+
     }
       //only the host should be able to start the game once everyone has joined,
       //so this hides the button for all other users
@@ -335,20 +374,13 @@ function updateAlias() {
   function shuffle(array) {
     var currentIndex = array.length,
       temporaryValue, randomIndex;
-
-    // While there remain elements to shuffle...
     while (0 !== currentIndex) {
-
-      // Pick a remaining element...
       randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex -= 1;
-
-      // And swap it with the current element.
       temporaryValue = array[currentIndex];
       array[currentIndex] = array[randomIndex];
       array[randomIndex] = temporaryValue;
     }
-
     return array;
   }
 
