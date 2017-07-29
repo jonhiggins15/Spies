@@ -1,37 +1,16 @@
 var ref = firebase.database().ref("/rooms");
-var STATE = {OPEN: 1, JOINED: 2, CLOSED: 3};
+var STATE = {OPEN: 1, JOINED: 2, CLOSED: 3};  //not sure what state does
 gameList = document.querySelector("#gameList ul");
 var user;
+
 //need this function because if you put auth stuff outside a function,
 //it gets called right when the page loads which makes it not work
 function getUser(){
   user = firebase.auth().currentUser;
 }
-/*FIREBASE DATABASE DOCS:
-    hostuid: user id of the room's creater
 
-    players: list of all players by their user id's
-
-    dayKillVote: the uid of the player the player that is being
-      referenced voted to kill. "none" means they have not voted.
-
-    isAlive: True if alive, false if dead
-
-    isHost: true if referenced player created the referenced room
-
-    name: chosen alias, just their email if they dont choose
-
-    role: the character they play in the game. eg hacker, spy ...
-
-    uid: their user id.  Needed bacause we can't reference parent
-      nodes in the database
-
-    roomName: Rooms name. Needed for the same reason as above
-    
-    state: ongoing if a game is in progress and waiting if the game is
-      created but the host still needs to start it.  If you get a null value
-      for this, use the REST API instead of the firebase listener
-*/
+//Creates all the firebase values to what they should be for when a room is
+//started.  firebase docs are in the readme
 function createGame(){
     getUser();
     var joinName = $('#roomName').val();
@@ -53,22 +32,11 @@ function createGame(){
       usedAbility: true,
       guarded: false
     });
-
-    //TODO: I dont really know how or if this works, so im just leaving it commented out
-    //for now.  Fix in the future.
-
-    // key.set(game, function(error){
-    //   if(error){
-    //     console.log("Error creating game", error);
-    //   }else{
-    //     console.log("Created game");
-    //     key.onDisconnect().remove();
-    //   }
-    // })
+    //redirects to main after everything is initalized
     window.location.href='main.html';
 }
 
-
+//helper function for joinGameList
 function gameListGen(s){
   var gameList = document.getElementById('gameList');
   for(x in s){
@@ -78,6 +46,8 @@ function gameListGen(s){
   }
 }
 
+//not currently in use, but would like to inclued buttons to join rooms
+//the player is already in so they dont have to memorize room names.
 function joinGameList(){
   var dbRef = firebase.database().ref().child('rooms');
   dbRef.on('value', function(snapshot){
@@ -86,6 +56,7 @@ function joinGameList(){
   var item = document.createElement("li");
 }
 
+//creates a list with all the names of rooms, helper function for joinGame
 function listOfNames(s){
   var r = [];
   for(x in s){
@@ -94,6 +65,7 @@ function listOfNames(s){
   return r;
 }
 
+//uses REST API to return the json file with all of firebase in it
 function getJson(){
   var xhttp = new XMLHttpRequest();
 
@@ -105,17 +77,21 @@ function getJson(){
   return response;
 }
 
+//gets called by join game button.
 function joinGame(){
   getUser();
+  //a reference to all the cildren of rooms (the different rooms)
   var dbRef = firebase.database().ref().child('rooms');
   var l = [];
   var input = $('#joinGameTextfield').val();
   var all = getJson();
+  //not using listener proproties, this should just be called every time it runs
+  //through the method
   dbRef.on('value', function(snapshot){
     l = listOfNames(snapshot.val());
     if(l.indexOf(input)<0){
+      //cant find room in list
       console.log(l.indexOf(input));
-
       $('#nonexistingRoom').text("This room does not exist");
     }else{ //this else checks if a player is already in the room, and adds them
       //if the user isn't
