@@ -4,10 +4,10 @@
   -after page refreshes, the radio button is empty -> should show who you voted for
   -time based on host's timezone instead of each user
   -optimize jquerry calls -> sometimes I call one after another which is bad for speed and data caps
-  -in index.html you teh login button doesnt work on thin screens
-  -login button should close module (also index.html)
   -in testing, when I first started the game, name on screen was unassigned but when the screen was refreshed,
     it changed
+  NOTE: try using window.location.replace(). This could fix some issues with page views and other. Doesnt mess with local storage
+        so user info should maintain between pages, hopefully. 
    */
 
 
@@ -21,6 +21,7 @@ var config = {
 };
 firebase.initializeApp(config);
 const auth = firebase.auth();
+var counter = 0;
 var currUser; //returns current user
 var uid;  //current user's uid
 var alias;  //Then name they go by in the room
@@ -113,7 +114,23 @@ function findRoom() {
       }
     }
   }
-  updateAlias();
+  // updateAlias();
+}
+
+function checkPlayerNum(){
+  var all = getJson();
+  var room = returnRoom();
+  var numPlayers = [];
+  for (x in all.rooms[room].players) {
+    numPlayers.push(x);
+  }
+  if (numPlayers.length < 4) {
+    document.getElementById("hostStartButton").disabled = true;
+    $('#hostButton').append("<b>There needs to be 4 or more players to begin the game </b>");
+  }
+  else {
+    document.getElementById("hostStartButton").disabled = false;
+  }
 }
 
 //creates both dayList (allows people to vote to kill someone), and playerList,
@@ -298,6 +315,7 @@ function startView() {
   if (isHost) {
     //only the host can start the game
     $('#hostStartButton').show();
+    checkPlayerNum();
   } else {
     $('#hostStartButton').hide();
   }
@@ -319,11 +337,15 @@ function inGameView() {
 //it has mutated to do a bunch of other things too.  Picks what view to use,
 //kills somone at the end of the day, and more small stuff
 function updateAlias() {
+  counter += 1;
+  console.log(x);
   if (alias == email) {
     needAliasView();
     //dont want them to use email as alias
   } else {
-    startView();
+    if(counter <= 1){
+      startView();
+    }
     var all = getJson();
     var room = returnRoom();
     var killName;
@@ -350,7 +372,7 @@ function updateAlias() {
           }
         }
       }
-      alert(killName);
+    //  alert(killName);
       //this is the only way I could figure out how to remove firebase nodes
       var roomRef = firebase.database().ref('rooms/' + room + '/players/'+killName);
       roomRef.remove()
@@ -361,7 +383,7 @@ function updateAlias() {
           console.log("Remove failed: " + error.message)
         });
 
-      alert("change to night");
+    //  alert("change to night");
       //for whatever reason, doesnt work when redirected, but works like this
       // window.location.href='night.html';
 
@@ -409,7 +431,7 @@ function updateAlias() {
 
   //Shuffles array of uid's
   function shuffle(array) {
-    var currentIndex = array.length,
+    var currentInde= array.length,
       temporaryValue, randomIndex;
     while (0 !== currentIndex) {
       randomIndex = Math.floor(Math.random() * currentIndex);
