@@ -3,11 +3,13 @@
   -Now it refreshes whole page when new dial is selected. Listeners arn't working but that would be a lot cleaner
   -after page refreshes, the radio button is empty -> should show who you voted for
   -time based on host's timezone instead of each user
+  -login button doesnt work when window is snaped to one
+  - sign in button should close the modulus
   -optimize jquerry calls -> sometimes I call one after another which is bad for speed and data caps
   -in testing, when I first started the game, name on screen was unassigned but when the screen was refreshed,
     it changed
   NOTE: try using window.location.replace(). This could fix some issues with page views and other. Doesnt mess with local storage
-        so user info should maintain between pages, hopefully. 
+        so user info should maintain between pages, hopefully.
    */
 
 
@@ -177,7 +179,6 @@ function makeVoteList() {
     }
 
   }
-  console.log(dict);
   return dict;
 }
 
@@ -284,23 +285,12 @@ function startGame() {
 
 //makes room name what the player wants instead of their email
 function setName() {
-  var alias = $('#aliasInput').val();
+  var all = getJson();
+  var alias = all.users[uid].alias;
   firebase.database().ref('rooms/' + currRoom + '/players/' + uid).update({
     name: alias
   });
   updateAlias();
-}
-
-//creates the view for when players need to make their alias
-function needAliasView() {
-  $('#currRoom').hide();
-  $('#currUser').hide();
-  $('.nameInput').show();
-  $('#playerList').hide();
-  $('#dayList').hide();
-  $('#waitingRoom').show();
-  $('#hostStartButton').hide();
-  $('#role').hide();
 }
 
 //alias is created, but game hasn't started yet
@@ -338,9 +328,8 @@ function inGameView() {
 //kills somone at the end of the day, and more small stuff
 function updateAlias() {
   counter += 1;
-  console.log(x);
   if (alias == email) {
-    needAliasView();
+    setName();
     //dont want them to use email as alias
   } else {
     if(counter <= 1){
@@ -374,6 +363,7 @@ function updateAlias() {
       }
     //  alert(killName);
       //this is the only way I could figure out how to remove firebase nodes
+      //TODO: make sure this doesnt remove multuple players when night comes
       var roomRef = firebase.database().ref('rooms/' + room + '/players/'+killName);
       roomRef.remove()
         .then(function(){
@@ -383,9 +373,9 @@ function updateAlias() {
           console.log("Remove failed: " + error.message)
         });
 
-    //  alert("change to night");
+     alert("change to night");
       //for whatever reason, doesnt work when redirected, but works like this
-      // window.location.href='night.html';
+      // window.location.replace('night.html');
 
     }
       //only the host should be able to start the game once everyone has joined,

@@ -1,3 +1,6 @@
+//TODO: HUGE bug when creating a game -> game wont load, page needs to be closed
+
+
 var ref = firebase.database().ref("/rooms");
 var STATE = {OPEN: 1, JOINED: 2, CLOSED: 3};  //not sure what state does
 gameList = document.querySelector("#gameList ul");
@@ -93,9 +96,23 @@ function joinGame(){
       //cant find room in list
       console.log(l.indexOf(input));
       $('#nonexistingRoom').text("This room does not exist");
-    }else{ //this else checks if a player is already in the room, and adds them
+    }else{
+      //TODO: check if user is in users, add them if they are not
+      //make current room their room
+      alert("set");
+      firebase.database().ref('users/'+user.uid).update({
+        room: input
+      });
+
+      if(all.users[user.uid].alias == null){
+        userAlias = $('#nameForm').val();
+        firebase.database().ref('users/'+user.uid).update({
+          alias: userAlias
+        });
+      }
+      //this else checks if a player is already in the room, and adds them
       //if the user isn't
-      console.log(all);
+
       var found = false;
       for(i in all.rooms[input].players){
         if(user.uid == all.rooms[input].players[i].uid){
