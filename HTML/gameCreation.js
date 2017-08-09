@@ -6,6 +6,17 @@ var STATE = {OPEN: 1, JOINED: 2, CLOSED: 3};  //not sure what state does
 gameList = document.querySelector("#gameList ul");
 var user;
 
+
+
+auth.onAuthStateChanged(function(user){
+  //checks if name in sign-in is a value, makes it their name if it is
+  var nameForm = $('#nameForm').val();
+  if(nameForm != ""){
+    firebase.database().ref('users/'+user.uid).update({
+      alias: nameForm
+    });
+  }
+});
 //need this function because if you put auth stuff outside a function,
 //it gets called right when the page loads which makes it not work
 function getUser(){
@@ -18,17 +29,19 @@ function createGame(){
     getUser();
     var joinName = $('#roomName').val();
     var userId = user.uid;
-    var userEmail = user.email;
+    var userAlias = user.email;
+    var all = getJson();
     firebase.database().ref('rooms/' + joinName).set({
       hostuid: userId,
       roomName: joinName,
       //room state can be either waiting (if in waiting room) or ongoing
       state: "waiting"
     });
+    userAlias = all.users[user.uid].alias;
     firebase.database().ref('rooms/'+joinName+'/players/'+userId).set({
       role: "unassigned",
       uid: userId,
-      name: userEmail,
+      name: userAlias,
       isHost: true,
       isAlive: true,
       dayKillVote: "none",
@@ -36,6 +49,9 @@ function createGame(){
       guarded: false
     });
     //redirects to main after everything is initalized
+    firebase.database().ref('users/'+user.uid).update({
+      room: joinName
+    });
     window.location.href='main.html';
 }
 
@@ -104,12 +120,6 @@ function joinGame(){
         room: input
       });
 
-      if(all.users[user.uid].alias == null){
-        userAlias = $('#nameForm').val();
-        firebase.database().ref('users/'+user.uid).update({
-          alias: userAlias
-        });
-      }
       //this else checks if a player is already in the room, and adds them
       //if the user isn't
 
@@ -118,17 +128,17 @@ function joinGame(){
         if(user.uid == all.rooms[input].players[i].uid){
           found = true;
           alert("already member");
-          console.log("already member of room");
           window.location.href='main.html';
         }
       }
       if(!found){
         //didnt find player, add them to room
+        var userAlias = all.users[user.uid].alias;
         if(all.rooms[input].state == "waiting"){
           firebase.database().ref('rooms/'+input+'/players/'+user.uid).set({
             role: "unassigned",
             uid: user.uid,
-            name: user.email,
+            name: userAlias,
             isHost: false,
             isAlive: true,
             dayKillVote: "none",

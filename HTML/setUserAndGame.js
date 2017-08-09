@@ -106,26 +106,31 @@ stateRef.on('value', function(snapshot) {
 //need to test when the player is in multiple rooms
 function findRoom() {
   all = getJson();
-  for (i in all.rooms) {
-    for (x in all.rooms[i].players) {
-      if (currUser.uid == x) {
-        currRoom = i;
-        alias = all.rooms[i].players[currUser.uid].name;
-        isHost = all.rooms[i].players[currUser.uid].isHost;
-        $('#currRoom').text("Welcome, " + alias + " you are in room " + i);
-      }
-    }
-  }
-  // updateAlias();
+  var room = all.users[currUser.uid].room;
+  var alias = all.users[currUser.uid].alias;
+  $('#currRoom').text("Welcome, " + alias + " you are in room " + room);
+  // for (i in all.rooms) {
+  //   for (x in all.rooms[i].players) {
+  //     if (currUser.uid == x) {
+  //       currRoom = i;
+  //       alias = all.rooms[i].players[currUser.uid].name;
+  //       isHost = all.rooms[i].players[currUser.uid].isHost;
+  //       $('#currRoom').text("Welcome, " + alias + " you are in room " + i);
+  //     }
+  //   }
+  // }
+  updateAlias();
 }
 
 function checkPlayerNum(){
+  alert("check player num");
   var all = getJson();
   var room = returnRoom();
   var numPlayers = [];
   for (x in all.rooms[room].players) {
     numPlayers.push(x);
   }
+  alert(numPlayers.length);
   if (numPlayers.length < 4) {
     document.getElementById("hostStartButton").disabled = true;
     $('#hostButton').append("<b>There needs to be 4 or more players to begin the game </b>");
@@ -159,7 +164,7 @@ function makeUserList() {
     }else{
       $('#dayListNames').append('<input type="radio" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
     }
-    $('#dayList').hide();
+    //$('#dayList').hide();
   }
   updateAlias();
 }
@@ -193,7 +198,6 @@ function changeRole(role, uid) {
   //this elemets is randomized for a little variety each game
   if(role == "random"){
     role = a.pop();
-    alert(role);
   }
   if (role == "civ" || role == "spy" || role == "deadMansHand") {
     //for civ, spy, deadMansHand nothing needs to be updated besides role
@@ -295,6 +299,7 @@ function setName() {
 
 //alias is created, but game hasn't started yet
 function startView() {
+  var all = getJson();
   $('#currRoom').show();
   $('#currUser').show();
   $('.nameInput').hide();
@@ -302,13 +307,14 @@ function startView() {
   $('#dayList').hide();
   $('#waitingRoom').show();
   $('#role').hide();
-  if (isHost) {
-    //only the host can start the game
+  var room = findRoom();
+  alert(all.rooms[room].players[user.uid].isHost);
+  if(all.rooms[room].players[user.uid].isHost){
     $('#hostStartButton').show();
-    checkPlayerNum();
-  } else {
+  }else{
     $('#hostStartButton').hide();
   }
+
 }
 
 //in game
@@ -342,7 +348,7 @@ function updateAlias() {
     //displays the players role
     $('#role').text(all.rooms[room].players[uid].role);
     var time = new Date();
-    if (time.getHours() < 5 || time.getHours() > 15 || false) {
+    if (time.getHours() < 5 || time.getHours() > 16 || false) {
       //this means it's night
       var dict = {};
       for (x in all.rooms[room].players) {
@@ -361,7 +367,6 @@ function updateAlias() {
           }
         }
       }
-    //  alert(killName);
       //this is the only way I could figure out how to remove firebase nodes
       //TODO: make sure this doesnt remove multuple players when night comes
       var roomRef = firebase.database().ref('rooms/' + room + '/players/'+killName);
@@ -385,13 +390,7 @@ function updateAlias() {
   //retruns the r current room name
   function returnRoom() {
     all = getJson();
-    for (i in all.rooms) {
-      for (x in all.rooms[i].players) {
-        if (uid == x) {
-          return i;
-        }
-      }
-    }
+    return all.users[currUser.uid].room;
   }
 
   //returns a JSON of the database using REST API
