@@ -109,28 +109,16 @@ function findRoom() {
   var room = all.users[currUser.uid].room;
   var alias = all.users[currUser.uid].alias;
   $('#currRoom').text("Welcome, " + alias + " you are in room " + room);
-  // for (i in all.rooms) {
-  //   for (x in all.rooms[i].players) {
-  //     if (currUser.uid == x) {
-  //       currRoom = i;
-  //       alias = all.rooms[i].players[currUser.uid].name;
-  //       isHost = all.rooms[i].players[currUser.uid].isHost;
-  //       $('#currRoom').text("Welcome, " + alias + " you are in room " + i);
-  //     }
-  //   }
-  // }
   updateAlias();
 }
 
 function checkPlayerNum(){
-  alert("check player num");
   var all = getJson();
   var room = returnRoom();
   var numPlayers = [];
   for (x in all.rooms[room].players) {
     numPlayers.push(x);
   }
-  alert(numPlayers.length);
   if (numPlayers.length < 4) {
     document.getElementById("hostStartButton").disabled = true;
     $('#hostButton').append("<b>There needs to be 4 or more players to begin the game </b>");
@@ -307,9 +295,9 @@ function startView() {
   $('#dayList').hide();
   $('#waitingRoom').show();
   $('#role').hide();
-  var room = findRoom();
-  alert(all.rooms[room].players[user.uid].isHost);
-  if(all.rooms[room].players[user.uid].isHost){
+  var room = returnRoom();
+  console.log(room);
+  if(all.rooms[room].players[uid].isHost){
     $('#hostStartButton').show();
   }else{
     $('#hostStartButton').hide();
@@ -348,41 +336,50 @@ function updateAlias() {
     //displays the players role
     $('#role').text(all.rooms[room].players[uid].role);
     var time = new Date();
-    if (time.getHours() < 5 || time.getHours() > 16 || false) {
-      //this means it's night
-      var dict = {};
-      for (x in all.rooms[room].players) {
-        var kill = all.rooms[room].players[x].dayKillVote;
-        if (dict[kill] == null) {
-          dict[kill] = 1;
-        } else {
-          dict[kill] = dict[kill] + 1;
-        }
-      }
-      for (i in dict) {
-        if (i != "none") {
-          if (votes < dict[i]) {
-            votes = dict[i];
-            killName = i;
+    if(all.rooms[room].state == "ongoing"){
+      if (time.getHours() < 5 || time.getHours() > 7 || false) {
+        //this means it's night
+        var dict = {};
+        for (x in all.rooms[room].players) {
+          var kill = all.rooms[room].players[x].dayKillVote;
+          if (dict[kill] == null) {
+            dict[kill] = 1;
+          } else {
+            dict[kill] = dict[kill] + 1;
           }
         }
+        for (i in dict) {
+          if (i != "none") {
+            if (votes < dict[i]) {
+              votes = dict[i];
+              killName = i;
+            }
+          }
+        }
+        //this is the only way I could figure out how to remove firebase nodes
+        //TODO: make sure this doesnt remove multuple players when night comes
+        var roomRef = firebase.database().ref('rooms/' + room + '/players/'+killName);
+        if(killName == uid){
+          //if the loged-in user is the user that everyone voted to kill,
+          //they remove their info when they log in
+          roomRef.remove()
+            .then(function(){
+              console.log("sucess");
+              window.location.replace(index.html);
+            })
+            .catch(function(error) {
+              console.log("Remove failed: " + error.message)
+            });
+        }
+      //  alert("change to night");
+        //for whatever reason, doesnt work when redirected, but works like this
+        window.location.replace('night.html');
+
       }
-      //this is the only way I could figure out how to remove firebase nodes
-      //TODO: make sure this doesnt remove multuple players when night comes
-      var roomRef = firebase.database().ref('rooms/' + room + '/players/'+killName);
-      roomRef.remove()
-        .then(function(){
-          console.log("sucess");
-        })
-        .catch(function(error) {
-          console.log("Remove failed: " + error.message)
-        });
-
-     alert("change to night");
-      //for whatever reason, doesnt work when redirected, but works like this
-      // window.location.replace('night.html');
-
+    }else{
+      startView();
     }
+
       //only the host should be able to start the game once everyone has joined,
       //so this hides the button for all other users
   }
@@ -420,15 +417,21 @@ function updateAlias() {
 
   //Shuffles array of uid's
   function shuffle(array) {
-    var currentInde= array.length,
-      temporaryValue, randomIndex;
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
     while (0 !== currentIndex) {
+
+      // Pick a remaining element...
       randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex -= 1;
+
+      // And swap it with the current element.
       temporaryValue = array[currentIndex];
       array[currentIndex] = array[randomIndex];
       array[randomIndex] = temporaryValue;
     }
+
     return array;
   }
 

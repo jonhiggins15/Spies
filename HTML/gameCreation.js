@@ -46,7 +46,8 @@ function createGame(){
       isAlive: true,
       dayKillVote: "none",
       usedAbility: true,
-      guarded: false
+      guarded: false,
+      nightVote: ""
     });
     //redirects to main after everything is initalized
     firebase.database().ref('users/'+user.uid).update({
@@ -115,7 +116,6 @@ function joinGame(){
     }else{
       //TODO: check if user is in users, add them if they are not
       //make current room their room
-      alert("set");
       firebase.database().ref('users/'+user.uid).update({
         room: input
       });
@@ -143,7 +143,8 @@ function joinGame(){
             isAlive: true,
             dayKillVote: "none",
             usedAbility: true,
-            guarded: false
+            guarded: false,
+            nightVote: ""
           });
           window.location.href='main.html';
         }else{

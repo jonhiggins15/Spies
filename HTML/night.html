@@ -2,11 +2,19 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>title</title>
+    <title>Night</title>
   </head>
   <body>
+    <nav class="navbar navbar-inverse bg-primary">
+      <button id="signOut" value="sign out" onclick="signOut()">Sign Out</button>
+    </nav>
     <h1 id="player"></h1>
-    <h1>Loads</h1>
+    <div id="list">
+      <form id="names">
+        <ul style="none">
+        </ul>
+      </form>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
