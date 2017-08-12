@@ -111,7 +111,6 @@ function joinGame(){
     l = listOfNames(snapshot.val());
     if(l.indexOf(input)<0){
       //cant find room in list
-      console.log(l.indexOf(input));
       $('#nonexistingRoom').text("This room does not exist");
     }else{
       //TODO: check if user is in users, add them if they are not
@@ -127,7 +126,6 @@ function joinGame(){
       for(i in all.rooms[input].players){
         if(user.uid == all.rooms[input].players[i].uid){
           found = true;
-          alert("already member");
           window.location.href='main.html';
         }
       }

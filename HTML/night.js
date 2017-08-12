@@ -10,6 +10,7 @@ var config = {
 };
 firebase.initializeApp(config);
 const auth = firebase.auth();
+var roomRef = firebase.database().ref().child('rooms');
 var u;
 var role;
 var room;
@@ -45,7 +46,6 @@ function findRole(){
   var all = getJson();
   room = all.users[u.uid].room;
   role = all.rooms[room].players[u.uid].role;
-  console.log("Room: "+room+" Role: "+role);
   switch(role){
     case "civ":
       civ();
@@ -53,6 +53,27 @@ function findRole(){
     case "spy":
       spy();
       break;
+    case "hacker":
+      hacker();
+      break;
+  }
+}
+function hacker(){
+  $("#player").text("Hacker");
+  var all = getJson();
+  if(all.rooms[room].players[u.uid].usedAbility == true){
+    $("#player").text("Hacker"); //TODO: this should be the hacked charactor
+    var hacked = all.rooms[room].players[u.uid].hacked;
+    for(x in all.rooms[room].players){
+      if(x == hacked){
+        $('#miscHeadline').text(all.rooms[room].players[x].name + " is a " + all.rooms[room].players[x].role);
+      }
+    }
+  }else{
+    for (x in all.rooms[room].players) {
+      $('#names').append('<input type="radio" name="player" onclick="hackerListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+
+    }
   }
 }
 
@@ -62,13 +83,10 @@ function civ(){
 
 function spy(){
   $("#player").text("Spy");
-  makeUserList();
-}
-
-function makeUserList() {
   var all = getJson();
   d = makeSpyList();
   $('#dayListNames').empty();
+  console.log(d);
   //finds how many votes each player has
   for (x in all.rooms[room].players) {
     var votes;
@@ -78,12 +96,12 @@ function makeUserList() {
       votes = d[all.rooms[room].players[x].uid];
     }
     //see who the player voted for
-    var currVote = all.rooms[room].players[u.uid].dayKillVote;
+    var currVote = all.rooms[room].players[u.uid].nightVote;
     if(currVote == all.rooms[room].players[x].uid){
       //makes the radio buttons pre-checked if currUser voted for that player
-      $('#names').append('<input type="radio" checked="true" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+      $('#names').append('<input type="radio" checked="true" name="player" onclick="spyVote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
     }else{
-      $('#names').append('<input type="radio" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+      $('#names').append('<input type="radio" name="player" onclick="spyVote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
     }
   }
 }
@@ -96,8 +114,8 @@ function makeSpyList() {
 
   for (x in all.rooms[room].players) {
     var kill;
-    if(all.rooms[room].players.role == "spy" && all.rooms[room].players.nightVote != ""){
-      kill = all.rooms[room].players.nightVote;
+    if(all.rooms[room].players[x].role == "spy" && all.rooms[room].players[x].nightVote){
+      kill = all.rooms[room].players[x].nightVote;
       if (dict[kill] == null) {
         dict[kill] = 1;
       } else {
@@ -105,20 +123,36 @@ function makeSpyList() {
       }
     }
   }
+  console.log(dict);
   return dict;
 }
 
 //votes for a player to kill
-function vote(x) {
+function spyVote(x) {
   var all = getJson();
   alert(room+", "+u.uid);
-  alert(all.rooms[room].players[u.uid].nightVote);
-  firebase.database().ref('rooms/' + room ).set({
-    nightVote: "name"
-  });
-  firebase.database().ref('rooms/' + room).update({
-    state: "waiting"
+  firebase.database().ref('rooms/' + room + '/players/'+ u.uid).update({
+    nightVote: x
   });
   //need to reload to see the updated vote tallys
   location.reload();
+}
+
+function hackerListener(x){
+  var all = getJson();
+  for(i in all.rooms[room].players){
+    if(i == x){
+      alert(all.rooms[room].players[i].role);
+      $('#miscHeadline').text(all.rooms[room].players[i].name + " is a " + all.rooms[room].players[i].role);
+      firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
+        usedAbility: true,
+        hacked: all.rooms[room].players[i].uid
+      });
+      $('#list').hide();
+    }
+  }
+}
+
+function getRoleFromUid(x){
+
 }

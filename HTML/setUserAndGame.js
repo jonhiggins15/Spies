@@ -296,7 +296,6 @@ function startView() {
   $('#waitingRoom').show();
   $('#role').hide();
   var room = returnRoom();
-  console.log(room);
   if(all.rooms[room].players[uid].isHost){
     $('#hostStartButton').show();
   }else{

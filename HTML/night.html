@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Night</title>
-  </head>
-  <body>
-    <nav class="navbar navbar-inverse bg-primary">
-      <button id="signOut" value="sign out" onclick="signOut()">Sign Out</button>
-    </nav>
-    <h1 id="player"></h1>
-    <div id="list">
-      <form id="names">
-        <ul style="none">
-        </ul>
-      </form>
-    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="night.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <title>Night</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse bg-primary">
+    <button id="signOut" value="sign out" onclick="signOut()">Sign Out</button>
+  </nav>
+  <h1 id="player"></h1>
+  <h1 id="miscHeadline"></h1>
+  <div id="list">
+    <form id="names">
+      <ul style="none">
+      </ul>
+    </form>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="night.js"></script>
+</body>
+
 </html>
