@@ -14,7 +14,8 @@ var roomRef = firebase.database().ref().child('rooms');
 var u;
 var role;
 var room;
-
+var matchmakerA = "";
+var matchmakerB = "";
 
 auth.onAuthStateChanged(function(user){
   if (user && user != null){
@@ -56,13 +57,45 @@ function findRole(){
     case "hacker":
       hacker();
       break;
+    case "matchmaker":
+      matchmaker();
+      break;
+    case "bodyguard":
+      bodyguard();
+      break;
   }
 }
+
+function matchmaker(){
+  $("#player").text("Matchmaker");
+  var all = getJson();
+  if(all.rooms[room].players[u.uid].usedAbility == true){
+    $('#miscHeadline').text("Ability used");
+  }else{
+    for (x in all.rooms[room].players) {
+      $('#names').append('<input type="checkbox" value="'+all.rooms[room].players[x].uid+
+      '" onclick="matchmakerListener(this.value)" class="single-checkbox">' +
+      all.rooms[room].players[x].name);
+    }
+  }
+}
+
+function bodyguard(){
+  var all = getJson();
+  $("#player").text("Bodyguard");
+  if(all.rooms[room].players[u.uid].usedAbility == true){
+    $('#miscHeadline').text("Ability used");
+  }else{
+    for (x in all.rooms[room].players) {
+      $('#names').append('<input type="radio" name="player" onclick="bodyguardListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+    }
+  }
+}
+
 function hacker(){
   $("#player").text("Hacker");
   var all = getJson();
   if(all.rooms[room].players[u.uid].usedAbility == true){
-    $("#player").text("Hacker"); //TODO: this should be the hacked charactor
     var hacked = all.rooms[room].players[u.uid].hacked;
     for(x in all.rooms[room].players){
       if(x == hacked){
@@ -72,7 +105,6 @@ function hacker(){
   }else{
     for (x in all.rooms[room].players) {
       $('#names').append('<input type="radio" name="player" onclick="hackerListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
-
     }
   }
 }
@@ -138,6 +170,40 @@ function spyVote(x) {
   location.reload();
 }
 
+function matchmakerListener(x){
+  $('input.single-checkbox').on('change', function(evt) {
+     if($(this).siblings(':checked').length >= 2) {
+         this.checked = false;
+     }
+  });
+  if(matchmakerA == ""){
+    matchmakerA = x;
+  }else{
+    alert(matchmakerA+', '+x);
+    firebase.database().ref('rooms/'+room+'/players/'+x).update({
+      lover: matchmakerA
+    });
+    firebase.database().ref('rooms/'+room+'/players/'+matchmakerA).update({
+      lover: x
+    });
+    firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
+      usedAbility: true
+    });
+    $('#list').hide();
+  }
+}
+
+function bodyguardListener(x){
+  var all = getJson();
+  firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
+    usedAbility: true
+  });
+  firebase.database().ref('rooms/'+room+'/players/'+x).update({
+    guarded: true
+  });
+  $('#list').hide();
+}
+
 function hackerListener(x){
   var all = getJson();
   for(i in all.rooms[room].players){
@@ -151,8 +217,4 @@ function hackerListener(x){
       $('#list').hide();
     }
   }
-}
-
-function getRoleFromUid(x){
-
 }
