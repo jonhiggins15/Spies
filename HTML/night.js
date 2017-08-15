@@ -63,6 +63,25 @@ function findRole(){
     case "bodyguard":
       bodyguard();
       break;
+    case "deadMansHand":
+      $("#player").text("Dead man's hand");
+      break;
+    case "burglar":
+      burglar();
+      break;
+  }
+}
+
+function burglar(){
+  $("#player").text("Burglar");
+  var all = getJson();
+  for (x in all.rooms[room].players) {
+    if(all.rooms[room].players[u.uid].steal == all.rooms[room].players[x].uid){
+      //makes the radio buttons pre-checked if currUser voted for that player
+      $('#names').append('<input type="radio" checked="true" name="player" onclick="burglarListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+    }else{
+      $('#names').append('<input type="radio" name="player" onclick="burglarListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+    }
   }
 }
 
@@ -191,6 +210,12 @@ function matchmakerListener(x){
     });
     $('#list').hide();
   }
+}
+
+function burglarListener(x){
+  firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
+    steal: x
+  });
 }
 
 function bodyguardListener(x){
