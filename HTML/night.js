@@ -22,10 +22,14 @@ auth.onAuthStateChanged(function(user){
     u = user;
     findRole();
   }else{
-    window.location.replace("index.html");
+    window.location.assign("index.html");
   }
 
 });
+
+function die(){
+  window.location.assign("death.html");
+}
 
 //uses REST API to return the json file with all of firebase in it
 function getJson(){

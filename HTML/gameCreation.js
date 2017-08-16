@@ -2,6 +2,7 @@
 
 
 var ref = firebase.database().ref("/rooms");
+var database = firebase.database();
 var STATE = {OPEN: 1, JOINED: 2, CLOSED: 3};  //not sure what state does
 gameList = document.querySelector("#gameList ul");
 var user;

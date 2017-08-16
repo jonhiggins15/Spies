@@ -8,7 +8,7 @@
   -optimize jquerry calls -> sometimes I call one after another which is bad for speed and data caps
   -in testing, when I first started the game, name on screen was unassigned but when the screen was refreshed,
     it changed
-  NOTE: try using window.location.replace(). This could fix some issues with page views and other. Doesnt mess with local storage
+  NOTE: try using window.location.assign(). This could fix some issues with page views and other. Doesnt mess with local storage
         so user info should maintain between pages, hopefully.
    */
 
@@ -364,7 +364,7 @@ function updateAlias() {
           roomRef.remove()
             .then(function(){
               console.log("sucess");
-              window.location.replace(index.html);
+              window.location.assign(index.html);
             })
             .catch(function(error) {
               console.log("Remove failed: " + error.message)
@@ -372,7 +372,7 @@ function updateAlias() {
         }
       //  alert("change to night");
         //for whatever reason, doesnt work when redirected, but works like this
-        window.location.replace('night.html');
+        window.location.assign('night.html');
 
       }
     }else{
