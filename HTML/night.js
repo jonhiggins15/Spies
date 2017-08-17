@@ -16,6 +16,7 @@ var role;
 var room;
 var matchmakerA = "";
 var matchmakerB = "";
+var isDay = false;
 
 auth.onAuthStateChanged(function(user){
   if (user && user != null){
@@ -161,6 +162,11 @@ function spy(){
   }
 }
 
+function toDay(){
+  isDay = true;
+  changeToDay();
+}
+
 //makes a map with the uid as the key and the number of people who voted to
 //kill them as the value
 function makeSpyList() {
@@ -180,6 +186,59 @@ function makeSpyList() {
   }
   console.log(dict);
   return dict;
+}
+
+function changeToDay(){
+  var all = getJson();
+  var time = new Date();
+  if (isDay){
+    var spyList = makeSpyList();
+    var killName;
+    var votes = 0;
+    for (i in spyList) {
+      if (i != "none") {
+        if (votes < spyList[i]) {
+          votes = spyList[i];
+          killName = i;
+        }
+      }
+    }
+    if(killName == u.uid){
+      alert("killed");
+      window.location.assign('death.html');
+    }else{
+      if(killName != null){
+        firebase.database().ref('rooms/'+room+'/players/'+killName).update({
+          isAlive: false
+        });
+      }
+      if(role == "bodyguard" || role == "hacker" || role == "burglar"){
+        firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
+          usedAbility: false
+        });
+      }
+      if(role == "burglar"){
+        var victimUid = all.rooms[room].players[u.uid].steal;
+        var stolenRole = all.rooms[room].players[victimUid].role;
+        var usedAbilityValue = false
+        if(stolenRole == "matchmaker"){
+          if(all.rooms[room].players[victimUid].usedAbility == true){
+            usedAbilityValue = true;
+          }
+        }
+        firebase.database().ref('rooms/'+room+'/players/'+victimUid).update({
+          usedAbility: false,
+          role: "burglar"
+        });
+        firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
+          usedAbility: usedAbilityValue,
+          role: stolenRole
+        });
+        alert("all done");
+      }
+      window.location.assign('main.html');
+    }
+  }
 }
 
 //votes for a player to kill
@@ -217,6 +276,7 @@ function matchmakerListener(x){
 }
 
 function burglarListener(x){
+  alert("burglar listener");
   firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
     steal: x
   });

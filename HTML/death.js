@@ -15,6 +15,7 @@ var u;
 var dead = false;
 
 auth.onAuthStateChanged(function(user) {
+  alert("auth");
   if (user && user != null){
     if (dead){
       window.location.href = 'index.html';
@@ -48,9 +49,6 @@ function main(){
         alert(u.uid);
         kill(all.rooms[room].players[u.uid].lover);
         kill(u.uid);
-
-        alert("post");
-
         //window.location.assign("index.html");
       }
     }
@@ -69,6 +67,7 @@ function bodyguardListener(x){
 }
 
 function kill(x) {
+  alert("kill");
   var pRef = firebase.database().ref('rooms/' + room + '/players/' + x);
   //if the loged-in user is the user that everyone voted to kill,
   //they remove their info when they log in
@@ -76,12 +75,9 @@ function kill(x) {
   pRef.on('value', function(snapshot){
     console.log(snapshot.val());
   });
-  alert("kill");
-
   pRef.remove()
     .then(function() {
       console.log("sucess");
-      alert("sucess");
       if(x == u.uid){
         window.location.href = 'index.html';
       }else{
@@ -92,7 +88,6 @@ function kill(x) {
       console.log("Remove failed: " + error.message)
       alert("failed");
     });
-    alert("dead");
 }
 
 function back(){

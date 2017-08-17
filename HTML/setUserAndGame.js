@@ -32,6 +32,7 @@ var email;  //their email (in case they dont have an alias)
 var isHost; //True if they created the game
 var dbRef = firebase.database().ref().child('rooms'); //refernece to the list of rooms
 var locked = true;  //locks the stateRef listener until auth is finished.
+var isNight = false;
 //shouldn't need this lock but the listeners are weird
 var rand = ["matchmaker", "deadMansHand", "burglar"];
 //everything is inside auth listener because all the code relies on knowing what
@@ -101,6 +102,11 @@ stateRef.on('value', function(snapshot) {
 //     }
 //   }
 // });
+
+function toggleNight(){
+  isNight = true;
+  updateAlias();
+}
 
 //sets currRoom to the room the player is currently in
 //need to test when the player is in multiple rooms
@@ -216,6 +222,7 @@ function checkEndGame(){
       agentsNum++;
     }
   }
+  alert("spies: "+spyNum+"agents: "+agentsNum);
   if(spyNum > agentsNum){
     //spies can outvote players during the day if there are more spies
     alert("Spies Win!!");
@@ -333,10 +340,11 @@ function updateAlias() {
     var killName;
     var votes = 0;
     //displays the players role
+    checkEndGame();
     $('#role').text(all.rooms[room].players[uid].role);
     var time = new Date();
     if(all.rooms[room].state == "ongoing"){
-      if (time.getHours() < 5 || time.getHours() > 7 || false) {
+      if (isNight) {
         //this means it's night
         var dict = {};
         for (x in all.rooms[room].players) {
@@ -361,19 +369,11 @@ function updateAlias() {
         if(killName == uid){
           //if the loged-in user is the user that everyone voted to kill,
           //they remove their info when they log in
-          roomRef.remove()
-            .then(function(){
-              console.log("sucess");
-              window.location.assign(index.html);
-            })
-            .catch(function(error) {
-              console.log("Remove failed: " + error.message)
-            });
+          alert("dying");
+          window.location.assign('death.html');
+        }else{
+          window.location.assign('night.html');
         }
-      //  alert("change to night");
-        //for whatever reason, doesnt work when redirected, but works like this
-        window.location.assign('night.html');
-
       }
     }else{
       startView();
