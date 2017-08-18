@@ -8,8 +8,6 @@
   -optimize jquerry calls -> sometimes I call one after another which is bad for speed and data caps
   -in testing, when I first started the game, name on screen was unassigned but when the screen was refreshed,
     it changed
-  NOTE: try using window.location.assign(). This could fix some issues with page views and other. Doesnt mess with local storage
-        so user info should maintain between pages, hopefully.
    */
 
 
@@ -23,15 +21,13 @@ var config = {
 };
 firebase.initializeApp(config);
 const auth = firebase.auth();
-var counter = 0;
 var currUser; //returns current user
 var uid;  //current user's uid
 var alias;  //Then name they go by in the room
-var currRoom; //the room name they are in
+var room; //the room name they are in
 var email;  //their email (in case they dont have an alias)
 var isHost; //True if they created the game
 var dbRef = firebase.database().ref().child('rooms'); //refernece to the list of rooms
-var locked = true;  //locks the stateRef listener until auth is finished.
 var isNight = false;
 //shouldn't need this lock but the listeners are weird
 var rand = ["matchmaker", "deadMansHand", "burglar"];
@@ -51,76 +47,18 @@ auth.onAuthStateChanged(function(user) {
     //user isnt logged in
     window.location.href = 'index.html';
   }
-  findRoom();
+  initialView();
   makeUserList();
-  updateAlias();
-
-  currRoom = returnRoom();
-  locked = false;
-
-});
-//In theory, these listeners should run everytime the game state changes, and
-//everytime one of the children of players chenges.  That is not how i actually
-//works.
-
-
-//this is really messy because the listener doesnt seem to work when the value actually changes but
-//does run when it's not supposed to and doesnt have the recources to work...
-var stateRef = firebase.database().ref('rooms/' + currRoom + '/state');
-stateRef.on('value', function(snapshot) {
-  //needs this lock otherwise it will run this listener before the auth one
-  if (!locked) {
-    if (snapshot.val() == "waiting") {
-      //waithing for host to start game
-      updateAlias();
-    } else if (snapshot.val() != null) {
-      //hide waiting elements, player is in a running game
-      inGameView();
-    } else {
-      //if it's null, the listener ran before it had the recources it needs
-      var all = getJson();
-      var room = returnRoom();
-      var state = all.rooms[room].state;
-      if (state == "ongoing") {
-        inGameView();
-      } else {
-        updateAlias();
-      }
-    }
-  }
 });
 
-// firebase.database().ref('rooms/'+currRoom+'/players').on('value',function(snapshot){
-//   if (!locked) {
-//     if (snapshot.val() == "waiting") {
-//       $('#waitingRoom').show();
-//       $('#dayList').hide();
-//     } else if(snapshot.val() != null) {
-//       //hide waiting elements
-//       $('#waitingRoom').hide();
-//       $('#dayList').show();
-//     }
-//   }
-// });
-
+//Just a function for testing
 function toggleNight(){
   isNight = true;
-  updateAlias();
-}
-
-//sets currRoom to the room the player is currently in
-//need to test when the player is in multiple rooms
-function findRoom() {
-  all = getJson();
-  var room = all.users[currUser.uid].room;
-  var alias = all.users[currUser.uid].alias;
-  $('#currRoom').text("Welcome, " + alias + " you are in room " + room);
-  updateAlias();
+  updateView();
 }
 
 function checkPlayerNum(){
   var all = getJson();
-  var room = returnRoom();
   var numPlayers = [];
   for (x in all.rooms[room].players) {
     numPlayers.push(x);
@@ -138,7 +76,6 @@ function checkPlayerNum(){
 //(so host can see who has jooined the room before they start the game)
 function makeUserList() {
   var all = getJson();
-  var room = returnRoom();
   var d = makeVoteList();  //a map with uid's and kill votes
   $('#dayListNames').empty();
   //finds how many votes each player has
@@ -160,9 +97,7 @@ function makeUserList() {
         $('#dayListNames').append('<input type="radio" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
       }
     }
-    //$('#dayList').hide();
   }
-  updateAlias();
 }
 
 //makes a map with the uid as the key and the number of people who voted to
@@ -170,7 +105,6 @@ function makeUserList() {
 function makeVoteList() {
   var all = getJson();
   var dict = {};
-  var room = returnRoom();
   for (x in all.rooms[room].players) {
     if(all.rooms[room].players[x].isAlive == true){
       var kill = all.rooms[room].players[x].dayKillVote;
@@ -184,11 +118,9 @@ function makeVoteList() {
   return dict;
 }
 
-//sets a players role
 function changeRole(role, uid) {
   //role is a string of what the player's role is
   var all = getJson();
-  var room = returnRoom();
   var a = shuffle(rand);
   //for some players, they can either be randomly assigned deadMansHand,
   //matchmaker, or burglar, but there should only be one per game.
@@ -213,33 +145,31 @@ function changeRole(role, uid) {
 
 function checkEndGame(){
   var all = getJson();
-  var room = returnRoom();
   var spyNum = 0;
   var agentsNum = 0;
   //counts the num of spies and agents
-  for (x in all.rooms[room].players) {
-    if(all.rooms[room].players[x].isAlive == true){
-      if(all.rooms[room].players[x].role == "spy"){
-        spyNum++;
-      }else{
-        agentsNum++;
+  if(all.rooms[room].state == "ongoing"){
+    for (x in all.rooms[room].players) {
+      if(all.rooms[room].players[x].isAlive == true){
+        if(all.rooms[room].players[x].role == "spy"){
+          spyNum++;
+        }else{
+          agentsNum++;
+        }
       }
     }
-  }
-  //alert("spies: "+spyNum+"agents: "+agentsNum);
-  if(spyNum > agentsNum){
-    //spies can outvote players during the day if there are more spies
-    alert("Spies Win!!");
-    window.location.assign('endGame.html');
-  }else if(spyNum == 0){
-    alert("Agents Win!!");
-    window.location.assign('endGame.html');
+    if(spyNum > agentsNum){
+      //spies can outvote players during the day if there are more spies
+      alert("Spies Win!!");
+      window.location.assign('endGame.html');
+    }else if(spyNum == 0){
+      alert("Agents Win!!");
+      window.location.assign('endGame.html');
+    }
   }
 }
 
-
 function startGame() {
-  var room = returnRoom();
   firebase.database().ref('rooms/' + room).update({
     state: "ongoing"
   });
@@ -286,13 +216,13 @@ function startGame() {
         changeRole("spy", numPlayers.pop());
       break;
   }
+  updateView();
 }
 
-//makes room name what the player wants instead of their email
 function setName() {
   var all = getJson();
   var alias = all.users[uid].alias;
-  firebase.database().ref('rooms/' + currRoom + '/players/' + uid).update({
+  firebase.database().ref('rooms/' + room + '/players/' + uid).update({
     name: alias
   });
   updateAlias();
@@ -308,13 +238,11 @@ function startView() {
   $('#dayList').hide();
   $('#waitingRoom').show();
   $('#role').hide();
-  var room = returnRoom();
   if(all.rooms[room].players[uid].isHost){
     $('#hostStartButton').show();
   }else{
     $('#hostStartButton').hide();
   }
-
 }
 
 //in game
@@ -329,25 +257,23 @@ function inGameView() {
   $('#role').show();
 }
 
-//This function makes users pick an alias to identify them to other users, but
-//it has mutated to do a bunch of other things too.  Picks what view to use,
-//kills somone at the end of the day, and more small stuff
-function updateAlias() {
-  counter += 1;
-  if (alias == email) {
-    setName();
-    //dont want them to use email as alias
-  } else {
-    if(counter <= 1){
-      startView();
-    }
-    var all = getJson();
-    var room = returnRoom();
-    var killName;
-    var votes = 0;
-    //displays the players role
-    checkEndGame();
-    $('#role').text(all.rooms[room].players[uid].role);
+function initialView(){
+  var all = getJson();
+  var alias = all.users[uid].alias;
+  room = all.users[uid].room;
+  firebase.database().ref('rooms/' + room + '/players/' + uid).update({
+    name: alias
+  });
+  $('#currRoom').text("Welcome " + alias + " you are in room " + room);
+  updateView();
+}
+
+function updateView(){
+  var all = getJson();
+  var state = all.rooms[room].state;
+  if(state == "waiting"){
+    startView();
+  }else if (state == "ongoing") {
     var time = new Date();
     if(all.rooms[room].state == "ongoing"){
       if (isNight) {
@@ -369,75 +295,63 @@ function updateAlias() {
             }
           }
         }
-        //this is the only way I could figure out how to remove firebase nodes
-        //TODO: make sure this doesnt remove multuple players when night comes
-        var roomRef = firebase.database().ref('rooms/' + room + '/players/'+killName);
         if(killName == uid){
           //if the loged-in user is the user that everyone voted to kill,
           //they remove their info when they log in
-          alert("dying");
           window.location.assign('death.html');
         }else{
           window.location.assign('night.html');
         }
       }
     }else{
-      startView();
+      checkEndGame();
+      inGameView();
     }
-
-      //only the host should be able to start the game once everyone has joined,
-      //so this hides the button for all other users
+    $('#role').text(all.rooms[room].players[uid].role);
+  }else if (state == "over") {
+    window.location.assign('endGame.html');
   }
 }
-  //retruns the r current room name
-  function returnRoom() {
-    all = getJson();
-    return all.users[currUser.uid].room;
+
+//returns a JSON of the database using REST API
+function getJson() {
+  var xhttp = new XMLHttpRequest();
+
+  //TODO: IMPORTANT: before putting this on the website, change rules and put some
+  //form of authentication in the url
+  xhttp.open("GET", "https://spies-dcdf2.firebaseio.com/.json?print=pretty", false);
+  xhttp.send();
+  var response = JSON.parse(xhttp.responseText);
+  return response;
+}
+//user signed out and alias redirects them to index.html
+function signOut() {
+  firebase.auth().signOut();
+}
+
+//votes for a player to kill
+function vote(user) {
+  firebase.database().ref('rooms/' + room + '/players/' + uid).update({
+    dayKillVote: user
+  });
+  //need to reload to see the updated vote tallys
+  location.reload();
+}
+
+//Shuffles array of uid's
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
   }
+  return array;
+}
 
-  //returns a JSON of the database using REST API
-  function getJson() {
-    var xhttp = new XMLHttpRequest();
-
-    //TODO: IMPORTANT: before putting this on the website, change rules and put some
-    //form of authentication in the url
-    xhttp.open("GET", "https://spies-dcdf2.firebaseio.com/.json?print=pretty", false);
-    xhttp.send();
-    var response = JSON.parse(xhttp.responseText);
-    return response;
-  }
-  //user signed out and alias redirects them to index.html
-  function signOut() {
-    firebase.auth().signOut();
-  }
-
-  //votes for a player to kill
-  function vote(user) {
-    firebase.database().ref('rooms/' + currRoom + '/players/' + uid).update({
-      dayKillVote: user
-    });
-    //need to reload to see the updated vote tallys
-    location.reload();
-  }
-
-  //Shuffles array of uid's
-  function shuffle(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-
-      // And swap it with the current element.
-      temporaryValue = array[currentIndex];
-      array[currentIndex] = array[randomIndex];
-      array[randomIndex] = temporaryValue;
-    }
-
-    return array;
-  }
-
-  //uses REST api to get the whole firebase database and make it an object, which is returned
+//uses REST api to get the whole firebase database and make it an object, which is returned
