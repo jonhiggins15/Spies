@@ -48,10 +48,35 @@ function signOut() {
   firebase.auth().signOut();
 }
 
+function checkEndGame(){
+  var all = getJson();
+  var spyNum = 0;
+  var agentsNum = 0;
+  //counts the num of spies and agents
+  for (x in all.rooms[room].players) {
+    if(all.rooms[room].players[x].isAlive == true){
+      if(all.rooms[room].players[x].role == "spy"){
+        spyNum++;
+      }else{
+        agentsNum++;
+      }
+    }
+  }
+  if(spyNum >= agentsNum){
+    //spies can outvote players during the day if there are more spies
+    alert("Spies Win!!");
+    window.location.assign('endGame.html');
+  }else if(spyNum == 0){
+    alert("Agents Win!!");
+    window.location.assign('endGame.html');
+  }
+}
+
 function findRole(){
   var all = getJson();
   room = all.users[u.uid].room;
   role = all.rooms[room].players[u.uid].role;
+  checkEndGame();
   switch(role){
     case "civ":
       civ();
@@ -81,11 +106,13 @@ function burglar(){
   $("#player").text("Burglar");
   var all = getJson();
   for (x in all.rooms[room].players) {
-    if(all.rooms[room].players[u.uid].steal == all.rooms[room].players[x].uid){
-      //makes the radio buttons pre-checked if currUser voted for that player
-      $('#names').append('<input type="radio" checked="true" name="player" onclick="burglarListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
-    }else{
-      $('#names').append('<input type="radio" name="player" onclick="burglarListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+    if(all.rooms[room].players[x].isAlive == true){
+      if(all.rooms[room].players[u.uid].steal == all.rooms[room].players[x].uid){
+        //makes the radio buttons pre-checked if currUser voted for that player
+        $('#names').append('<input type="radio" checked="true" name="player" onclick="burglarListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+      }else{
+        $('#names').append('<input type="radio" name="player" onclick="burglarListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+      }
     }
   }
 }
@@ -97,9 +124,11 @@ function matchmaker(){
     $('#miscHeadline').text("Ability used");
   }else{
     for (x in all.rooms[room].players) {
-      $('#names').append('<input type="checkbox" value="'+all.rooms[room].players[x].uid+
-      '" onclick="matchmakerListener(this.value)" class="single-checkbox">' +
-      all.rooms[room].players[x].name);
+      if(all.rooms[room].players[x].isAlive == true){
+        $('#names').append('<input type="checkbox" value="'+all.rooms[room].players[x].uid+
+        '" onclick="matchmakerListener(this.value)" class="single-checkbox">' +
+        all.rooms[room].players[x].name);
+      }
     }
   }
 }
@@ -111,7 +140,9 @@ function bodyguard(){
     $('#miscHeadline').text("Ability used");
   }else{
     for (x in all.rooms[room].players) {
-      $('#names').append('<input type="radio" name="player" onclick="bodyguardListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+      if(all.rooms[room].players[x].isAlive == true){
+        $('#names').append('<input type="radio" name="player" onclick="bodyguardListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+      }
     }
   }
 }
@@ -128,7 +159,9 @@ function hacker(){
     }
   }else{
     for (x in all.rooms[room].players) {
+      if(all.rooms[room].players[x].isAlive == true){
       $('#names').append('<input type="radio" name="player" onclick="hackerListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+      }
     }
   }
 }
@@ -145,19 +178,21 @@ function spy(){
   console.log(d);
   //finds how many votes each player has
   for (x in all.rooms[room].players) {
-    var votes;
-    if (d[all.rooms[room].players[x].uid] == null) {
-      votes = 0;
-    } else {
-      votes = d[all.rooms[room].players[x].uid];
-    }
-    //see who the player voted for
-    var currVote = all.rooms[room].players[u.uid].nightVote;
-    if(currVote == all.rooms[room].players[x].uid){
-      //makes the radio buttons pre-checked if currUser voted for that player
-      $('#names').append('<input type="radio" checked="true" name="player" onclick="spyVote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
-    }else{
-      $('#names').append('<input type="radio" name="player" onclick="spyVote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+    if(all.rooms[room].players[x].isAlive == true){
+      var votes;
+      if (d[all.rooms[room].players[x].uid] == null) {
+        votes = 0;
+      } else {
+        votes = d[all.rooms[room].players[x].uid];
+      }
+      //see who the player voted for
+      var currVote = all.rooms[room].players[u.uid].nightVote;
+      if(currVote == all.rooms[room].players[x].uid){
+        //makes the radio buttons pre-checked if currUser voted for that player
+        $('#names').append('<input type="radio" checked="true" name="player" onclick="spyVote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+      }else{
+        $('#names').append('<input type="radio" name="player" onclick="spyVote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+      }
     }
   }
 }

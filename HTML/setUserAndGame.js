@@ -152,11 +152,13 @@ function makeUserList() {
     $('#playerList .list').append('<li>' + all.rooms[room].players[x].name + '</li>');
     //see who the player voted for
     var currVote = all.rooms[room].players[uid].dayKillVote;
-    if(currVote == all.rooms[room].players[x].uid){
-      //makes the radio buttons pre-checked if currUser voted for that player
-      $('#dayListNames').append('<input type="radio" checked="true" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
-    }else{
-      $('#dayListNames').append('<input type="radio" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+    if(all.rooms[room].players[x].isAlive == true){
+      if(currVote == all.rooms[room].players[x].uid){
+        //makes the radio buttons pre-checked if currUser voted for that player
+        $('#dayListNames').append('<input type="radio" checked="true" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+      }else{
+        $('#dayListNames').append('<input type="radio" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+      }
     }
     //$('#dayList').hide();
   }
@@ -170,13 +172,14 @@ function makeVoteList() {
   var dict = {};
   var room = returnRoom();
   for (x in all.rooms[room].players) {
-    var kill = all.rooms[room].players[x].dayKillVote;
-    if (dict[kill] == null) {
-      dict[kill] = 1;
-    } else {
-      dict[kill] = dict[kill] + 1;
+    if(all.rooms[room].players[x].isAlive == true){
+      var kill = all.rooms[room].players[x].dayKillVote;
+      if (dict[kill] == null) {
+        dict[kill] = 1;
+      } else {
+        dict[kill] = dict[kill] + 1;
+      }
     }
-
   }
   return dict;
 }
@@ -208,7 +211,6 @@ function changeRole(role, uid) {
 
 }
 
-//untested.  This should end the game when spies/agents win
 function checkEndGame(){
   var all = getJson();
   var room = returnRoom();
@@ -216,18 +218,22 @@ function checkEndGame(){
   var agentsNum = 0;
   //counts the num of spies and agents
   for (x in all.rooms[room].players) {
-    if(all.rooms[room].players[x].role == "spy"){
-      spyNum++;
-    }else{
-      agentsNum++;
+    if(all.rooms[room].players[x].isAlive == true){
+      if(all.rooms[room].players[x].role == "spy"){
+        spyNum++;
+      }else{
+        agentsNum++;
+      }
     }
   }
-  alert("spies: "+spyNum+"agents: "+agentsNum);
+  //alert("spies: "+spyNum+"agents: "+agentsNum);
   if(spyNum > agentsNum){
     //spies can outvote players during the day if there are more spies
     alert("Spies Win!!");
+    window.location.assign('endGame.html');
   }else if(spyNum == 0){
     alert("Agents Win!!");
+    window.location.assign('endGame.html');
   }
 }
 
