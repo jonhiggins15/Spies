@@ -26,10 +26,8 @@
 </head>
 
 <nav class="navbar navbar-inverse bg-primary">
-  <button class="btn" id="signOut" value="sign out"></button>
+  <button class="material-icons" id="signOut">exit_to_app</button>
   <button class="material-icons" id="account" data-toggle="modal" data-target="#loginModal">account_circle</button>
-  <span id="line">|</span>
-  <span id="loginText">Log In</span>
   <div class="modal fade login" id="loginModal">
     <div class="modal-dialog login animated">
       <div class="modal-content">
@@ -56,24 +54,25 @@
                 <span>or</span>
                 <div class="line r"></div>
               </div>
-              <div class="error"></div>
+              <p id="login-error"></p>
               <div class="form loginBox">
                 <form method="post" action="/login" accept-charset="UTF-8">
                   <input id="email" class="form-control" type="text" placeholder="Email" name="email">
                   <input id="password" class="form-control" type="password" placeholder="Password" name="password">
-                  <input class="btn btn-default btn-login" id="signInButton" value="Login">
+                  <input class="btn btn-default btn-login" id="signInButton" value="Login" readonly>
                 </form>
               </div>
             </div>
           </div>
           <div class="box">
             <div class="content registerBox" style="display:none;">
+              <p id="signin-error"></p>
               <div class="form">
                 <form method="post" html="{:multipart=>true}" data-remote="true" action="/register" accept-charset="UTF-8">
                   <input id="emailForm" class="form-control" type="text" placeholder="Email" name="email">
                   <input id="passwordForm" class="form-control" type="password" placeholder="Password" name="password">
                   <input id="nameForm" class="form-control" type="text" placeholder="Your Name" name="password_confirmation">
-                  <input class="btn btn-default btn-register" value="Create account" id="signUpButton">
+                  <input class="btn btn-default btn-register" value="Create account" id="signUpButton" readonly>
                 </form>
               </div>
             </div>
@@ -82,12 +81,12 @@
         <div class="modal-footer">
           <div class="forgot login-footer">
             <span>Looking to
-                                <a href="javascript: showRegisterForm();">create an account</a>
+                                <a id="create-account-link" href="javascript: showRegisterForm();">create an account</a>
                            ?</span>
           </div>
           <div class="forgot register-footer" style="display:none">
             <span>Already have an account?</span>
-            <a href="javascript: showLoginForm();">Login</a>
+            <a id="login-link" href="javascript: showLoginForm();">Login</a>
           </div>
         </div>
       </div>

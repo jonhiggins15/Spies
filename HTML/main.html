@@ -4,29 +4,33 @@
 <head>
   <meta charset="utf-8">
   <title>Spies</title>
-</head>
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,500" rel="stylesheet">
 
 <body>
   <nav class="navbar navbar-inverse bg-primary">
-    <button id="signOut" value="sign out" onclick="signOut()">Sign Out</button>
+    <button class="material-icons" onclick="signOut()" id="signOut">exit_to_app</button>
   </nav>
-  <div id="waitingRoom">
-    <h1 id="currRoom"></h1>
-    <h1 id="currUser"></h1>
-    <div id="playerList">
-      <ul style="none" class="list">
-      </ul>
+  <div class="content">
+    <div id="waitingRoom">
+      <h1 id="waitingForHost">Waiting For Host</h1>
+      <h1 id="playerListExp">Players Joined</h1>
+      <div id="playerList">
+        <ul style="none" class="list">
+        </ul>
+      </div>
+      <div id="hostButton">
+        <button id="hostStartButton" onclick="startGame()">Start Game</button>
+      </div>
     </div>
-    <div id="hostButton">
-      <button id="hostStartButton" onclick="startGame()">Start Game</button>
+    <h1 id="role"></h1>
+    <div id="dayList">
+      <label id="dayListNames">
+        <ul style="none" class="list">
+        </ul>
+      </form>
     </div>
-  </div>
-  <h1 id="role"></h1>
-  <div id="dayList">
-    <form id="dayListNames">
-      <ul style="none" class="list">
-      </ul>
-    </form>
   </div>
   <button onclick="toggleNight()">Night</button>
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>

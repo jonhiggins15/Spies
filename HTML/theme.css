@@ -1,5 +1,11 @@
 *{
   outline: none;
+  margin:auto;
+}
+
+h1{
+  font-family: 'Roboto', sans-serif;
+  color: #ddca7e;
 }
 
 #formInput{
@@ -54,23 +60,27 @@
   z-index: 2;
 }
 
-#account{
+#account, #signOut{
   color: white;
   transition: .5s;
   background: transparent;
   border: none;
-  position: fixed;
-  left: auto;
+  background-color: #111;
+  left: 0;
   right: 0;
-  top: 12px;
+  top: 0px;
+  text-align: right;
+  padding: .2em;
+  width: 100%;
 }
+
 #gameList{
   color: black;
 }
 
 
-#account:hover{
-  color: black;
+#account:hover, #signOut:hover{
+  color: #333;
   transition: .5s;
 }
 
@@ -78,15 +88,6 @@
   color: black;
 }
 
-
-
-#signOut{
-  right: 0;
-  left: auto;
-  position: fixed;
-  top: 12px;
-  display: none;
-}
 
 #signInError{
   display: none;

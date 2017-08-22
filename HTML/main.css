@@ -1,0 +1,78 @@
+*{
+  background-color: white;
+  color: #222;
+  margin: auto;
+}
+
+ul{
+  list-style-type: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: 2em;
+  padding: .5em;
+}
+
+input[type="radio"]{
+  display:none;
+}
+
+label{
+  color: red;
+  padding: 1.5em;
+}
+
+h1{
+  font-family: 'Roboto', sans-serif;
+  color: #ddca7e;
+  font-size: 3em;
+}
+
+#hostStartButton:hover{
+  color: white;
+  background-color: #222;
+}
+
+#hostStartButton{
+  /*background-color: #222;*/
+  color: #222;
+  padding: 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 18px;
+  border: 2px solid #222;
+  font: 'Roboto', sans-serif;
+}
+
+#account, #signOut{
+  color: white;
+  transition: .5s;
+  background: transparent;
+  border: none;
+  background-color: #333;
+  left: 0;
+  right: 0;
+  top: 0px;
+  text-align: right;
+  padding: .2em;
+  width: 100%;
+}
+
+#account:hover, #signOut:hover{
+  color: #333;
+  transition: .5s;
+}
+
+.content{
+  text-align: center;
+  height: 200px;
+  position: relative;
+  margin: 0;
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#playerList{
+  top: 50%;
+}

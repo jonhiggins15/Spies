@@ -92,9 +92,16 @@ function makeUserList() {
     if(all.rooms[room].players[x].isAlive == true){
       if(currVote == all.rooms[room].players[x].uid){
         //makes the radio buttons pre-checked if currUser voted for that player
-        $('#dayListNames').append('<input type="radio" checked="true" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+        $('#dayListNames').append('<input type="radio" id="radbtn" checked="true" name="player" onclick="vote(this.value)" value='
+        + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name
+        + " " + votes);
       }else{
-        $('#dayListNames').append('<input type="radio" name="player" onclick="vote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+        $('#dayListNames').append('<input type="radio" id="'
+        +all.rooms[room].players[x].uid
+        +'" name="player" onclick="vote(this.value)" value='
+        + all.rooms[room].players[x].uid + '><label for='
+        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name
+        + " " + votes + "</label>");
       }
     }
   }
@@ -231,25 +238,24 @@ function setName() {
 //alias is created, but game hasn't started yet
 function startView() {
   var all = getJson();
-  $('#currRoom').show();
-  $('#currUser').show();
-  $('.nameInput').hide();
-  $('#playerList').show();
   $('#dayList').hide();
   $('#waitingRoom').show();
   $('#role').hide();
   if(all.rooms[room].players[uid].isHost){
     $('#hostStartButton').show();
+    $('#waitingForHost').hide();
+    $('#playerList').show();
+    $('#playerListExp').show();
   }else{
     $('#hostStartButton').hide();
+    $('#waitingForHost').show();
+    $('#playerList').hide();
+    $('#playerListExp').hide();
   }
 }
 
 //in game
 function inGameView() {
-  $('#currRoom').hide();
-  $('#currUser').hide();
-  $('.nameInput').hide();
   $('#playerList').hide();
   $('#dayList').show();
   $('#waitingRoom').hide();

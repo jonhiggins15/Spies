@@ -154,3 +154,8 @@
     border-color: #00A4E4;
     color:  #00A4E4;
 }
+
+#login-error, #signin-error{
+  color: red;
+  font-style: italic;
+}
