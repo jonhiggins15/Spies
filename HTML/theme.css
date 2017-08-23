@@ -1,11 +1,7 @@
 *{
   outline: none;
   margin:auto;
-}
-
-h1{
   font-family: 'Roboto', sans-serif;
-  color: #ddca7e;
 }
 
 #formInput{
@@ -24,12 +20,12 @@ h1{
 }
 
 #Header{
-  font-family: fantasy;
   color: white;
   background-color: black;
   padding-top: 50px;
   text-align: center;
   font-size: 100px;
+  font-weight: bold;
 }
 
 #body{
@@ -65,7 +61,7 @@ h1{
   transition: .5s;
   background: transparent;
   border: none;
-  background-color: #111;
+  background-color: black;
   left: 0;
   right: 0;
   top: 0px;
@@ -78,16 +74,14 @@ h1{
   color: black;
 }
 
-
 #account:hover, #signOut:hover{
-  color: #333;
+  color: #777;
   transition: .5s;
 }
 
 #roomButton{
   color: black;
 }
-
 
 #signInError{
   display: none;

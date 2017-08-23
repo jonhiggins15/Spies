@@ -86,6 +86,7 @@ function makeUserList() {
     } else {
       votes = d[all.rooms[room].players[x].uid];
     }
+    //alert(all.rooms[room].players[x].name);
     $('#playerList .list').append('<li>' + all.rooms[room].players[x].name + '</li>');
     //see who the player voted for
     var currVote = all.rooms[room].players[uid].dayKillVote;
@@ -93,8 +94,9 @@ function makeUserList() {
       if(currVote == all.rooms[room].players[x].uid){
         //makes the radio buttons pre-checked if currUser voted for that player
         $('#dayListNames').append('<input type="radio" id="radbtn" checked="true" name="player" onclick="vote(this.value)" value='
-        + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name
-        + " " + votes);
+        + all.rooms[room].players[x].uid + '><label for='
+        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name
+        + " " + votes + "</label>");
       }else{
         $('#dayListNames').append('<input type="radio" id="'
         +all.rooms[room].players[x].uid
@@ -271,6 +273,10 @@ function initialView(){
     name: alias
   });
   $('#currRoom').text("Welcome " + alias + " you are in room " + room);
+  alert(room+", "+ uid)
+  if(!all.rooms[room].players[uid].isAlive){
+    window.location.assign('death.html');
+  }
   updateView();
 }
 
@@ -293,6 +299,7 @@ function updateView(){
             dict[kill] = dict[kill] + 1;
           }
         }
+        var votes = 0;
         for (i in dict) {
           if (i != "none") {
             if (votes < dict[i]) {
@@ -306,7 +313,12 @@ function updateView(){
           //they remove their info when they log in
           window.location.assign('death.html');
         }else{
+          firebase.database().ref('rooms/' + room + '/players/' + killName).update({
+            isAlive: false
+          });
+          alert(killName);
           window.location.assign('night.html');
+
         }
       }
     }else{

@@ -125,9 +125,10 @@ function matchmaker(){
   }else{
     for (x in all.rooms[room].players) {
       if(all.rooms[room].players[x].isAlive == true){
-        $('#names').append('<input type="checkbox" value="'+all.rooms[room].players[x].uid+
-        '" onclick="matchmakerListener(this.value)" class="single-checkbox">' +
-        all.rooms[room].players[x].name);
+        $('#names').append('<input type="checkbox" id="'+all.rooms[room].players[x].uid
+        +'" name="player" onclick="matchmakerListener(this.value)" class="single-checkbox" value='
+        + all.rooms[room].players[x].uid + '><label for='
+        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+"</label>");
       }
     }
   }
@@ -141,7 +142,10 @@ function bodyguard(){
   }else{
     for (x in all.rooms[room].players) {
       if(all.rooms[room].players[x].isAlive == true){
-        $('#names').append('<input type="radio" name="player" onclick="bodyguardListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+        $('#names').append('<input type="radio" id="'
+        +all.rooms[room].players[x].uid +'" name="player" onclick="bodyguardListener(this.value)" value='
+        + all.rooms[room].players[x].uid + '><label for='
+        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+"</label>");
       }
     }
   }
@@ -160,7 +164,10 @@ function hacker(){
   }else{
     for (x in all.rooms[room].players) {
       if(all.rooms[room].players[x].isAlive == true){
-      $('#names').append('<input type="radio" name="player" onclick="hackerListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+        $('#names').append('<input type="radio" id="'
+        +all.rooms[room].players[x].uid +'" name="player" onclick="hackerListener(this.value)" value='
+        + all.rooms[room].players[x].uid + '><label for='
+        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+"</label>");
       }
     }
   }
@@ -189,9 +196,17 @@ function spy(){
       var currVote = all.rooms[room].players[u.uid].nightVote;
       if(currVote == all.rooms[room].players[x].uid){
         //makes the radio buttons pre-checked if currUser voted for that player
-        $('#names').append('<input type="radio" checked="true" name="player" onclick="spyVote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+        $('#names').append('<input type="radio" id="'
+        +all.rooms[room].players[x].uid +'" name="player" checked="true" onclick="spyVote(this.value)" value='
+        + all.rooms[room].players[x].uid + '><label for='
+        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+
+        ' '+votes+"</label>");
       }else{
-        $('#names').append('<input type="radio" name="player" onclick="spyVote(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name + " " + votes);
+        $('#names').append('<input type="radio" id="'
+        +all.rooms[room].players[x].uid +'" name="player" onclick="spyVote(this.value)" value='
+        + all.rooms[room].players[x].uid + '><label for='
+        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+
+        ' '+votes+"</label>");
       }
     }
   }
@@ -239,7 +254,6 @@ function changeToDay(){
       }
     }
     if(killName == u.uid){
-      alert("killed");
       window.location.assign('death.html');
     }else{
       if(killName != null){
@@ -269,7 +283,6 @@ function changeToDay(){
           usedAbility: usedAbilityValue,
           role: stolenRole
         });
-        alert("all done");
       }
       window.location.assign('main.html');
     }
@@ -279,7 +292,6 @@ function changeToDay(){
 //votes for a player to kill
 function spyVote(x) {
   var all = getJson();
-  alert(room+", "+u.uid);
   firebase.database().ref('rooms/' + room + '/players/'+ u.uid).update({
     nightVote: x
   });
@@ -296,7 +308,6 @@ function matchmakerListener(x){
   if(matchmakerA == ""){
     matchmakerA = x;
   }else{
-    alert(matchmakerA+', '+x);
     firebase.database().ref('rooms/'+room+'/players/'+x).update({
       lover: matchmakerA
     });
@@ -311,7 +322,6 @@ function matchmakerListener(x){
 }
 
 function burglarListener(x){
-  alert("burglar listener");
   firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
     steal: x
   });
@@ -332,7 +342,6 @@ function hackerListener(x){
   var all = getJson();
   for(i in all.rooms[room].players){
     if(i == x){
-      alert(all.rooms[room].players[i].role);
       $('#miscHeadline').text(all.rooms[room].players[i].name + " is a " + all.rooms[room].players[i].role);
       firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
         usedAbility: true,

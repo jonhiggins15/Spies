@@ -8,14 +8,12 @@ var config = {
 };
 firebase.initializeApp(config);
 const auth = firebase.auth();
-// var roomRef = firebase.database().ref().child('rooms');
 var database = firebase.database();
 var room;
 var u;
 var dead = false;
 
 auth.onAuthStateChanged(function(user) {
-  alert("auth");
   if (user && user != null){
     if (dead){
       window.location.href = 'index.html';
@@ -26,6 +24,11 @@ auth.onAuthStateChanged(function(user) {
     window.location.href = 'index.html';
   }
 });
+
+//user signed out and alias redirects them to index.html
+function signOut() {
+  firebase.auth().signOut();
+}
 
 function main(){
   var all = getJson();

@@ -14,7 +14,6 @@ var room;
 var u;
 
 auth.onAuthStateChanged(function(user){
-  alert("auth");
   if (user && user != null){
     u = user;
     checkEndGame();
@@ -51,13 +50,16 @@ function checkEndGame(){
   }
   if(spyNum >= agentsNum){
     //spies can outvote players during the day if there are more spies
-    alert("Spies Win!!");
     $('#winner').text("Spies Win");
   }else if(spyNum == 0){
-    alert("Agents Win!!");
     $('#winner').text("Spies Win");
   }
   firebase.database().ref('rooms/'+room).update({
     state: "over"
   });
+}
+
+//user signed out and alias redirects them to index.html
+function signOut() {
+  firebase.auth().signOut();
 }

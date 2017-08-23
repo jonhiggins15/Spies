@@ -1,0 +1,32 @@
+*{
+  background-color: #333;
+  color: white;
+  margin: auto;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+#account, #signOut{
+  color: white;
+  transition: .5s;
+  background: transparent;
+  border: none;
+  background-color: #111;
+  left: 0;
+  right: 0;
+  top: 0px;
+  text-align: right;
+  padding: .2em;
+  width: 100%;
+}
+
+#account:hover, #signOut:hover{
+  color: #777;
+  transition: .5s;
+}
+
+h1{
+  color: #ddca7e;
+  font-size: 5em;
+  padding: 1em;
+}
