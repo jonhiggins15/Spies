@@ -26,8 +26,8 @@ auth.onAuthStateChanged(function(user) {
 });
 
 //user signed out and alias redirects them to index.html
-function signOut() {
-  firebase.auth().signOut();
+function leaveGame() {
+  window.location.assign('index.html');
 }
 
 function main(){
@@ -44,12 +44,10 @@ function main(){
       firebase.database().ref('rooms/' + room + '/players/' + u.uid).update({
         guarded: false
       });
-      alert(room+", "+u.uid);
       dead = true;
       //window.location.assign("main.html");
     }else{
       if(all.rooms[room].players[u.uid].lover != null){
-        alert(u.uid);
         kill(all.rooms[room].players[u.uid].lover);
         kill(u.uid);
         //window.location.assign("index.html");
@@ -63,14 +61,12 @@ function main(){
 }
 
 function bodyguardListener(x){
-  alert(x);
   kill(x);
   kill(u.uid);
   //window.location.assign("index.html");
 }
 
 function kill(x) {
-  alert("kill");
   var pRef = firebase.database().ref('rooms/' + room + '/players/' + x);
   //if the loged-in user is the user that everyone voted to kill,
   //they remove their info when they log in
@@ -80,11 +76,10 @@ function kill(x) {
   });
   pRef.remove()
     .then(function() {
-      console.log("sucess");
       if(x == u.uid){
-        window.location.href = 'index.html';
+        // window.location.href = 'index.html';
       }else{
-        window.location.href = 'main.html';
+        // window.location.href = 'main.html';
       }
     })
     .catch(function(error) {

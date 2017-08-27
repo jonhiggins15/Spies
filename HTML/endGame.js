@@ -60,6 +60,6 @@ function checkEndGame(){
 }
 
 //user signed out and alias redirects them to index.html
-function signOut() {
-  firebase.auth().signOut();
+function leaveGame() {
+  window.location.assign('index.html');
 }

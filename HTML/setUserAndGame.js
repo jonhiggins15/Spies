@@ -35,6 +35,7 @@ var rand = ["matchmaker", "deadMansHand", "burglar"];
 //user is signed in
 
 $('#waitingRoom').hide();
+$('#dayVoteExp').hide();
 
 //this gets all the auth info about the current user, then calls other methods
 //to continue setting up the game.  Needs to run before stateRef
@@ -53,6 +54,7 @@ auth.onAuthStateChanged(function(user) {
 
 //Just a function for testing
 function toggleNight(){
+  alert(isNight);
   isNight = true;
   updateView();
 }
@@ -86,7 +88,6 @@ function makeUserList() {
     } else {
       votes = d[all.rooms[room].players[x].uid];
     }
-    //alert(all.rooms[room].players[x].name);
     $('#playerList .list').append('<li>' + all.rooms[room].players[x].name + '</li>');
     //see who the player voted for
     var currVote = all.rooms[room].players[uid].dayKillVote;
@@ -169,10 +170,8 @@ function checkEndGame(){
     }
     if(spyNum > agentsNum){
       //spies can outvote players during the day if there are more spies
-      alert("Spies Win!!");
       window.location.assign('endGame.html');
     }else if(spyNum == 0){
-      alert("Agents Win!!");
       window.location.assign('endGame.html');
     }
   }
@@ -243,6 +242,7 @@ function startView() {
   $('#dayList').hide();
   $('#waitingRoom').show();
   $('#role').hide();
+  $('#dayVoteExp').hide();
   if(all.rooms[room].players[uid].isHost){
     $('#hostStartButton').show();
     $('#waitingForHost').hide();
@@ -258,6 +258,7 @@ function startView() {
 
 //in game
 function inGameView() {
+  $('#dayVoteExp').show();
   $('#playerList').hide();
   $('#dayList').show();
   $('#waitingRoom').hide();
@@ -273,7 +274,6 @@ function initialView(){
     name: alias
   });
   $('#currRoom').text("Welcome " + alias + " you are in room " + room);
-  alert(room+", "+ uid)
   if(!all.rooms[room].players[uid].isAlive){
     window.location.assign('death.html');
   }
@@ -288,6 +288,7 @@ function updateView(){
   }else if (state == "ongoing") {
     var time = new Date();
     if(all.rooms[room].state == "ongoing"){
+      alert(isNight);
       if (isNight) {
         //this means it's night
         var dict = {};
@@ -300,6 +301,7 @@ function updateView(){
           }
         }
         var votes = 0;
+        var killName = "";
         for (i in dict) {
           if (i != "none") {
             if (votes < dict[i]) {
@@ -316,7 +318,6 @@ function updateView(){
           firebase.database().ref('rooms/' + room + '/players/' + killName).update({
             isAlive: false
           });
-          alert(killName);
           window.location.assign('night.html');
 
         }
@@ -343,8 +344,8 @@ function getJson() {
   return response;
 }
 //user signed out and alias redirects them to index.html
-function signOut() {
-  firebase.auth().signOut();
+function leaveGame() {
+  window.location.assign('index.html');
 }
 
 //votes for a player to kill
