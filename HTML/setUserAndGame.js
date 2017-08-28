@@ -30,7 +30,7 @@ var isHost; //True if they created the game
 var dbRef = firebase.database().ref().child('rooms'); //refernece to the list of rooms
 var isNight = false;
 //shouldn't need this lock but the listeners are weird
-var rand = ["matchmaker", "deadMansHand", "burglar"];
+var rand = ["Matchmaker", "Dead Man's Hand", "Burglar"];
 //everything is inside auth listener because all the code relies on knowing what
 //user is signed in
 
@@ -52,12 +52,12 @@ auth.onAuthStateChanged(function(user) {
   makeUserList();
 });
 
-//Just a function for testing
-function toggleNight(){
-  alert(isNight);
-  isNight = true;
-  updateView();
-}
+// //Just a function for testing
+// function toggleNight(){
+//   alert(isNight);
+//   isNight = true;
+//   updateView();
+// }
 
 function checkPlayerNum(){
   var all = getJson();
@@ -132,14 +132,14 @@ function changeRole(role, uid) {
   //role is a string of what the player's role is
   var all = getJson();
   var a = shuffle(rand);
-  //for some players, they can either be randomly assigned deadMansHand,
+  //for some players, they can either be randomly assigned Dead Man's Hand,
   //matchmaker, or burglar, but there should only be one per game.
   //this elemets is randomized for a little variety each game
   if(role == "random"){
     role = a.pop();
   }
-  if (role == "civ" || role == "spy" || role == "deadMansHand") {
-    //for civ, spy, deadMansHand nothing needs to be updated besides role
+  if (role == "Civilian" || role == "Spy" || role == "Dead Man's Hand") {
+    //for civ, spy, Dead Man's Hand nothing needs to be updated besides role
     firebase.database().ref('rooms/' + room + '/players/' + uid).update({
       role: role
     });
@@ -161,7 +161,7 @@ function checkEndGame(){
   if(all.rooms[room].state == "ongoing"){
     for (x in all.rooms[room].players) {
       if(all.rooms[room].players[x].isAlive == true){
-        if(all.rooms[room].players[x].role == "spy"){
+        if(all.rooms[room].players[x].role == "Spy"){
           spyNum++;
         }else{
           agentsNum++;
@@ -196,32 +196,32 @@ function startGame() {
       //this is supposed to add a civ for each player after 12 but
       //hasn't been tested and will also need to add spies occasionally
       while (numPlayers.length > 12) {
-        changeRole("civ", numPlayers.pop());
+        changeRole("Civilian", numPlayers.pop());
       }
     case 12:
-        changeRole("spy", numPlayers.pop());
+        changeRole("Spy", numPlayers.pop());
     case 11:
         changeRole("random", numPlayers.pop());
     case 10:
-        changeRole("civ", numPlayers.pop());
+        changeRole("Civilian", numPlayers.pop());
     case 9:
         changeRole("random", numPlayers.pop());
     case 8:
-        changeRole("civ", numPlayers.pop());
+        changeRole("Civilian", numPlayers.pop());
     case 7:
-        changeRole("bodyguard", numPlayers.pop());
+        changeRole("Bodyguard", numPlayers.pop());
     case 6:
-        changeRole("spy", numPlayers.pop());
+        changeRole("Spy", numPlayers.pop());
     case 5:
-        changeRole("civ", numPlayers.pop());
+        changeRole("Civilian", numPlayers.pop());
     case 4:
         changeRole("random", numPlayers.pop());
     case 3:
-        changeRole("civ", numPlayers.pop());
+        changeRole("Civilian", numPlayers.pop());
     case 2:
-        changeRole("hacker", numPlayers.pop());
+        changeRole("Hacker", numPlayers.pop());
     case 1:
-        changeRole("spy", numPlayers.pop());
+        changeRole("Spy", numPlayers.pop());
       break;
   }
   updateView();
@@ -288,8 +288,7 @@ function updateView(){
   }else if (state == "ongoing") {
     var time = new Date();
     if(all.rooms[room].state == "ongoing"){
-      alert(isNight);
-      if (isNight) {
+      if (time.getHours() > 17 || time.getHours() < 5) {
         //this means it's night
         var dict = {};
         for (x in all.rooms[room].players) {

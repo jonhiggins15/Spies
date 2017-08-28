@@ -78,25 +78,25 @@ function findRole(){
   role = all.rooms[room].players[u.uid].role;
   checkEndGame();
   switch(role){
-    case "civ":
+    case "Civilian":
       civ();
       break;
     case "spy":
       spy();
       break;
-    case "hacker":
+    case "Hacker":
       hacker();
       break;
     case "matchmaker":
       matchmaker();
       break;
-    case "bodyguard":
+    case "Bodyguard":
       bodyguard();
       break;
-    case "deadMansHand":
+    case "Dead Man's Hand":
       $("#player").text("Dead man's hand");
       break;
-    case "burglar":
+    case "Burglar":
       burglar();
       break;
   }
@@ -212,10 +212,10 @@ function spy(){
   }
 }
 
-function toDay(){
-  isDay = true;
-  changeToDay();
-}
+// function toDay(){
+//   isDay = true;
+//   changeToDay();
+// }
 
 //makes a map with the uid as the key and the number of people who voted to
 //kill them as the value
@@ -225,7 +225,7 @@ function makeSpyList() {
 
   for (x in all.rooms[room].players) {
     var kill;
-    if(all.rooms[room].players[x].role == "spy" && all.rooms[room].players[x].nightVote){
+    if(all.rooms[room].players[x].role == "Spy" && all.rooms[room].players[x].nightVote){
       kill = all.rooms[room].players[x].nightVote;
       if (dict[kill] == null) {
         dict[kill] = 1;
@@ -241,7 +241,7 @@ function makeSpyList() {
 function changeToDay(){
   var all = getJson();
   var time = new Date();
-  if (isDay){
+  if (time.getHours() < 17 && time.getHours() > 5){
     var spyList = makeSpyList();
     var killName;
     var votes = 0;
@@ -261,12 +261,12 @@ function changeToDay(){
           isAlive: false
         });
       }
-      if(role == "bodyguard" || role == "hacker" || role == "burglar"){
+      if(role == "Bodyguard" || role == "Hacker" || role == "Burglar"){
         firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
           usedAbility: false
         });
       }
-      if(role == "burglar"){
+      if(role == "Burglar"){
         var victimUid = all.rooms[room].players[u.uid].steal;
         var stolenRole = all.rooms[room].players[victimUid].role;
         var usedAbilityValue = false
@@ -321,7 +321,7 @@ function matchmakerListener(x){
   }
 }
 
-function burglarListener(x){
+function BurglarListener(x){
   firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
     steal: x
   });
