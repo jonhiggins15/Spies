@@ -55,7 +55,7 @@ function checkEndGame(){
   //counts the num of spies and agents
   for (x in all.rooms[room].players) {
     if(all.rooms[room].players[x].isAlive == true){
-      if(all.rooms[room].players[x].role == "spy"){
+      if(all.rooms[room].players[x].role == "Spy"){
         spyNum++;
       }else{
         agentsNum++;
