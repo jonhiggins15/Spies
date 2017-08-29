@@ -67,7 +67,7 @@ function checkPlayerNum(){
   }
   if (numPlayers.length < 4) {
     document.getElementById("hostStartButton").disabled = true;
-    $('#hostButton').append("<b>There needs to be 4 or more players to begin the game </b>");
+    $("#checkNum").css("visibility","visible");
   }
   else {
     document.getElementById("hostStartButton").disabled = false;
@@ -248,6 +248,7 @@ function startView() {
     $('#waitingForHost').hide();
     $('#playerList').show();
     $('#playerListExp').show();
+    checkPlayerNum();
   }else{
     $('#hostStartButton').hide();
     $('#waitingForHost').show();

@@ -42,6 +42,12 @@ label:hover{
   color: white;
 }
 
+#checkNum{
+  font-family: 'Roboto', sans-serif;
+  color: #b7001b;
+  padding: 1em;
+  visibility: hidden;
+}
 
 
 h1{
@@ -53,6 +59,7 @@ h1{
 }
 
 #hostStartButton:hover{
+  transition: .3s;
   color: white;
   background-color: #222;
 }
