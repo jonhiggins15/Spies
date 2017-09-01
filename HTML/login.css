@@ -1,6 +1,28 @@
+#body{
+  background-color: #222;
+}
+#Header{
+  background-color: #222;
+  /*Just playing around with the front page. Trying to make it look a little more interesting*/
+  text-decoration: line-through;
+  text-decoration-color: #222;
+}
+#footer{
+  position: absolute;
+  left: 3px;
+  bottom: 3px;
+  color: white;
+}
+
+.login .modal-title{
+  text-align: center;
+  padding-left: 13px;
+  font-size: 25px;
+}
 
 .login .modal-dialog{
-    width: 350px;
+    width: 25%;
+    padding-right: 19px;
 }
 .login .modal-footer{
     border-top: 0;
@@ -10,10 +32,6 @@
 .login .modal-header {
     border: 0 none;
     padding: 15px 15px 15px;
-/*     padding: 11px 15px; */
-}
-.login .modal-body{
-/*     background-color: #eeeeee; */
 }
 .login .division {
     float: none;
@@ -63,17 +81,11 @@
 .login .social .google{
     background-color: #F74933;
 }
-.login .social .github{
-    background-color: #403A3A;
-}
 .login .facebook:hover{
     background-color: #6E83CD;
 }
 .login .google:hover{
     background-color: #FF7566;
-}
-.login .github:hover{
-    background-color: #4D4D4d;;
 }
 .login .forgot {
     color: #797979;

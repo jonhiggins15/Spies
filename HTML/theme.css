@@ -70,11 +70,18 @@
   width: 100%;
 }
 
+#info{
+  color: white;
+  transition: .5s;
+  background: transparent;
+  border: none;
+}
+
 #gameList{
   color: black;
 }
 
-#account:hover, #signOut:hover{
+#account:hover, #signOut:hover, #info:hover{
   color: #777;
   transition: .5s;
 }
