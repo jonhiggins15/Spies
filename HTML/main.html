@@ -10,8 +10,9 @@
 
   <body>
     <nav class="navbar navbar-inverse bg-primary">
-      <button class="material-icons" onclick="leaveRoom()" id="signOut">home</button>
+      <button class="material-icons" onclick="leaveGame()" id="signOut">home</button>
     </nav>
+    <button onclick="toggleNight()">Night</button>
     <div class="content">
       <div id="waitingRoom">
         <h1 id="waitingForHost">Waiting For Host</h1>
@@ -26,6 +27,7 @@
         </div>
       </div>
       <h1 id="role"></h1>
+      <h2 id="lastKill"></h2>
       <div id="dayList">
         <form id="dayListNames">
           <ul style="none" class="list">
@@ -37,7 +39,7 @@
       </p>
     </div>
     <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js "></script>
     <script src="setUserAndGame.js"></script>
   </body>
 

@@ -52,12 +52,12 @@ auth.onAuthStateChanged(function(user) {
   makeUserList();
 });
 
-// //Just a function for testing
-// function toggleNight(){
-//   alert(isNight);
-//   isNight = true;
-//   updateView();
-// }
+//Just a function for testing
+function toggleNight(){
+  alert(isNight);
+  isNight = true;
+  updateView();
+}
 
 function checkPlayerNum(){
   var all = getJson();
@@ -259,13 +259,19 @@ function startView() {
 
 //in game
 function inGameView() {
+  var all = getJson();
+  var k = all.rooms[room].lastKill;
   $('#dayVoteExp').show();
   $('#playerList').hide();
   $('#dayList').show();
   $('#waitingRoom').hide();
   $('#hostStartButton').hide();
   $('#role').show();
+  if(k != null){
+    $('#lastKill').text(all.rooms[room].players[k].name + " Was killed in the night");
+  }
 }
+
 
 function initialView(){
   var all = getJson();
@@ -288,8 +294,8 @@ function updateView(){
     startView();
   }else if (state == "ongoing") {
     var time = new Date();
-    if(all.rooms[room].state == "ongoing"){
-      if (time.getHours() > 17 || time.getHours() < 5) {
+      // if (time.getHours() > 17 || time.getHours() < 5) {
+      if(isNight){
         //this means it's night
         var dict = {};
         for (x in all.rooms[room].players) {
@@ -318,11 +324,14 @@ function updateView(){
           firebase.database().ref('rooms/' + room + '/players/' + killName).update({
             isAlive: false
           });
+          firebase.database().ref('rooms/' + room).update({
+            lastKill: killName
+          });
+          alert("isAlive bug!");
           window.location.assign('night.html');
 
         }
-      }
-    }else{
+      }else{
       checkEndGame();
       inGameView();
     }

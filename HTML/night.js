@@ -64,10 +64,8 @@ function checkEndGame(){
   }
   if(spyNum >= agentsNum){
     //spies can outvote players during the day if there are more spies
-    alert("Spies Win!!");
     window.location.assign('endGame.html');
   }else if(spyNum == 0){
-    alert("Agents Win!!");
     window.location.assign('endGame.html');
   }
 }
@@ -76,12 +74,16 @@ function findRole(){
   var all = getJson();
   room = all.users[u.uid].room;
   role = all.rooms[room].players[u.uid].role;
+  var lastKill = all.rooms[room].lastKill;
+  if(lastKill != null){
+    $('#lastKill').text(all.rooms[room].players[lastKill].name + " was killed during the day");
+  }
   checkEndGame();
   switch(role){
     case "Civilian":
       civ();
       break;
-    case "spy":
+    case "Spy":
       spy();
       break;
     case "Hacker":
@@ -182,7 +184,6 @@ function spy(){
   var all = getJson();
   d = makeSpyList();
   $('#dayListNames').empty();
-  console.log(d);
   //finds how many votes each player has
   for (x in all.rooms[room].players) {
     if(all.rooms[room].players[x].isAlive == true){
@@ -212,10 +213,10 @@ function spy(){
   }
 }
 
-// function toDay(){
-//   isDay = true;
-//   changeToDay();
-// }
+function toDay(){
+  isDay = true;
+  changeToDay();
+}
 
 //makes a map with the uid as the key and the number of people who voted to
 //kill them as the value
@@ -234,14 +235,14 @@ function makeSpyList() {
       }
     }
   }
-  console.log(dict);
   return dict;
 }
 
 function changeToDay(){
   var all = getJson();
   var time = new Date();
-  if (time.getHours() < 17 && time.getHours() > 5){
+  // if (time.getHours() < 17 && time.getHours() > 5){
+  if (isDay){
     var spyList = makeSpyList();
     var killName;
     var votes = 0;
@@ -284,6 +285,9 @@ function changeToDay(){
           role: stolenRole
         });
       }
+      firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
+        guarded: false
+      });
       window.location.assign('main.html');
     }
   }

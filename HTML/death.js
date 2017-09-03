@@ -74,18 +74,18 @@ function kill(x) {
   pRef.on('value', function(snapshot){
     console.log(snapshot.val());
   });
-  pRef.remove()
-    .then(function() {
-      if(x == u.uid){
-        // window.location.href = 'index.html';
-      }else{
-        // window.location.href = 'main.html';
-      }
-    })
-    .catch(function(error) {
-      console.log("Remove failed: " + error.message)
-      alert("failed");
-    });
+  // pRef.remove()
+  //   .then(function() {
+  //     if(x == u.uid){
+  //       // window.location.href = 'index.html';
+  //     }else{
+  //       // window.location.href = 'main.html';
+  //     }
+  //   })
+  //   .catch(function(error) {
+  //     console.log("Remove failed: " + error.message)
+  //     alert("failed");
+  //   });
 }
 
 function back(){

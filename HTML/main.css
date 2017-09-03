@@ -58,6 +58,11 @@ h1{
   text-align: center;
 }
 
+h2{
+  font-family: 'Roboto', sans-serif;
+  color: #ddca7e;
+}
+
 #hostStartButton:hover{
   transition: .3s;
   color: white;
@@ -91,7 +96,7 @@ h1{
 }
 
 #account:hover, #signOut:hover{
-  color: #333;
+  color: #777;
   transition: .5s;
 }
 
