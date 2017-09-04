@@ -54,7 +54,6 @@ auth.onAuthStateChanged(function(user) {
 
 //Just a function for testing
 function toggleNight(){
-  alert(isNight);
   isNight = true;
   updateView();
 }
@@ -267,8 +266,14 @@ function inGameView() {
   $('#waitingRoom').hide();
   $('#hostStartButton').hide();
   $('#role').show();
-  if(k != null){
-    $('#lastKill').text(all.rooms[room].players[k].name + " Was killed in the night");
+  var wasKilledLine = "Killed during the night: ";
+  var noDeaths = true;
+  for(x in all.rooms[room].lastKill){
+    wasKilledLine = wasKilledLine + all.rooms[room].players[x].name + " ";
+    noDeaths = false;
+  }
+  if(!noDeaths){
+    $('#lastKill').text(wasKilledLine);
   }
 }
 
@@ -277,6 +282,19 @@ function initialView(){
   var all = getJson();
   var alias = all.users[uid].alias;
   room = all.users[uid].room;
+  for(x in all.rooms[room].lastKill){
+    if(all.rooms[room].lastKill[x] == 'day'){
+      var pRef = firebase.database().ref('rooms/' + room + '/lastKill/' + x);
+      pRef.remove()
+        .then(function() {
+          console.log("sucess");
+        })
+        .catch(function(error) {
+          console.log("Remove failed: " + error.message)
+          alert("failed");
+        });
+    }
+  }
   firebase.database().ref('rooms/' + room + '/players/' + uid).update({
     name: alias
   });
@@ -324,10 +342,9 @@ function updateView(){
           firebase.database().ref('rooms/' + room + '/players/' + killName).update({
             isAlive: false
           });
-          firebase.database().ref('rooms/' + room).update({
-            lastKill: killName
+          firebase.database().ref('rooms/' + room + '/lastKill').update({
+            [killName]: "day"
           });
-          alert("isAlive bug!");
           window.location.assign('night.html');
 
         }

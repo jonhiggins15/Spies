@@ -44,6 +44,9 @@ function main(){
       firebase.database().ref('rooms/' + room + '/players/' + u.uid).update({
         guarded: false
       });
+      firebase.database().ref('rooms/' + room).update({
+        lastKill: null
+      });
       dead = true;
       //window.location.assign("main.html");
     }else{

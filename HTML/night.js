@@ -72,11 +72,28 @@ function checkEndGame(){
 
 function findRole(){
   var all = getJson();
+  var wasKilledLine = "Killed during the day: ";
+  var noDeaths = true;
   room = all.users[u.uid].room;
   role = all.rooms[room].players[u.uid].role;
-  var lastKill = all.rooms[room].lastKill;
-  if(lastKill != null){
-    $('#lastKill').text(all.rooms[room].players[lastKill].name + " was killed during the day");
+  for(x in all.rooms[room].lastKill){
+    if(all.rooms[room].lastKill[x] == 'night'){
+      var pRef = firebase.database().ref('rooms/' + room + '/lastKill/' + x);
+      pRef.remove()
+        .then(function() {
+          console.log("sucess");
+        })
+        .catch(function(error) {
+          console.log("Remove failed: " + error.message)
+        });
+    }
+  }
+  for(x in all.rooms[room].lastKill){
+    wasKilledLine = wasKilledLine + all.rooms[room].players[x].name + " ";
+    noDeaths = false;
+  }
+  if(!noDeaths){
+    $('#lastKill').text(wasKilledLine);
   }
   checkEndGame();
   switch(role){
@@ -105,6 +122,7 @@ function findRole(){
 }
 
 function burglar(){
+  $('#names').empty();
   $("#player").text("Burglar");
   var all = getJson();
   for (x in all.rooms[room].players) {
@@ -120,6 +138,7 @@ function burglar(){
 }
 
 function matchmaker(){
+  $('#names').empty();
   $("#player").text("Matchmaker");
   var all = getJson();
   if(all.rooms[room].players[u.uid].usedAbility == true){
@@ -138,6 +157,7 @@ function matchmaker(){
 
 function bodyguard(){
   var all = getJson();
+  $('#names').empty();
   $("#player").text("Bodyguard");
   if(all.rooms[room].players[u.uid].usedAbility == true){
     $('#miscHeadline').text("Ability used");
@@ -154,6 +174,7 @@ function bodyguard(){
 }
 
 function hacker(){
+  $('#names').empty();
   $("#player").text("Hacker");
   var all = getJson();
   if(all.rooms[room].players[u.uid].usedAbility == true){
@@ -185,6 +206,7 @@ function spy(){
   d = makeSpyList();
   $('#dayListNames').empty();
   //finds how many votes each player has
+  $('#names').empty();
   for (x in all.rooms[room].players) {
     if(all.rooms[room].players[x].isAlive == true){
       var votes;
@@ -260,6 +282,9 @@ function changeToDay(){
       if(killName != null){
         firebase.database().ref('rooms/'+room+'/players/'+killName).update({
           isAlive: false
+        });
+        firebase.database().ref('rooms/'+room+'/lastKill').update({
+          [killName]: "night"
         });
       }
       if(role == "Bodyguard" || role == "Hacker" || role == "Burglar"){
