@@ -17,6 +17,13 @@ auth.onAuthStateChanged(function(user){
       alias: nameForm
     });
   }
+  $(window).on('load', function(){
+    getUser();
+    if(user){
+      console.log(user);
+      $('#gameModal').modal('show');
+    }
+  });
 });
 //need this function because if you put auth stuff outside a function,
 //it gets called right when the page loads which makes it not work

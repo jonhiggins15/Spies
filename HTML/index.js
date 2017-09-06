@@ -3,9 +3,12 @@ const auth = firebase.auth();
 
 auth.onAuthStateChanged(function(user) {
   if (user) {
-    console.log(user);
     $('#account').hide();
     $('#signOut').show();
+
+    console.log(user);
+    $('#gameModal').modal('show');
+    
   } else {
     $('#signOut').hide();
     $('#account').show();

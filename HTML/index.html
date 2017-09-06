@@ -95,7 +95,24 @@
   <header>
     <div id="Header">SPIES</div>
   </header>
+
   <body id="body">
+    <div id="gameModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Would you Like to rejoin:</h4>
+          </div>
+          <div class="modal-body">
+            <p id="currentRoom"></p>
+          </div>
+          <div class="modal-footer">
+            words
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="roomCreation">
       <button id="roomButton" data-toggle="modal" data-target="#creationForm">Create Room</button>
       <div id="creationForm" class="modal fade">
