@@ -17,13 +17,6 @@ auth.onAuthStateChanged(function(user){
       alias: nameForm
     });
   }
-  $(window).on('load', function(){
-    getUser();
-    if(user){
-      console.log(user);
-      $('#gameModal').modal('show');
-    }
-  });
 });
 //need this function because if you put auth stuff outside a function,
 //it gets called right when the page loads which makes it not work
@@ -106,13 +99,17 @@ function getJson(){
 }
 
 //gets called by join game button.
-function joinGame(){
+function joinGame(joinRoom){
   getUser();
   //a reference to all the cildren of rooms (the different rooms)
   var dbRef = firebase.database().ref().child('rooms');
   var l = [];
   var input = $('#joinGameTextfield').val();
   var all = getJson();
+  var room =all.users[user.uid].room;
+  if(room != null){
+    input = room;
+  }
   //not using listener proproties, this should just be called every time it runs
   //through the method
   dbRef.on('value', function(snapshot){

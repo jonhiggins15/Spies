@@ -1,4 +1,5 @@
-
+var room;
+var all;
 const auth = firebase.auth();
 
 auth.onAuthStateChanged(function(user) {
@@ -6,9 +7,16 @@ auth.onAuthStateChanged(function(user) {
     $('#account').hide();
     $('#signOut').show();
 
-    console.log(user);
-    $('#gameModal').modal('show');
-    
+    all = getJson();
+    room = all.users[user.uid].room;
+    console.log(room);
+    if(room != null){
+      $('#gameModal').modal('show');
+      $('#currentRoom').append('<button id="modalJoin" onclick="joinGame()"></button>');
+      $('#modalJoin').text(room);
+
+    }
+
   } else {
     $('#signOut').hide();
     $('#account').show();
