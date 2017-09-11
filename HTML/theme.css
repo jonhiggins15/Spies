@@ -5,7 +5,7 @@
 }
 
 #joinModal{
-  
+
 }
 
 #formInput{
@@ -69,9 +69,13 @@
   left: 0;
   right: 0;
   top: 0px;
-  text-align: right;
   padding: .2em;
+}
+
+#arroundButton{
   width: 100%;
+  background-color: black;
+  float: right;
 }
 
 #info{

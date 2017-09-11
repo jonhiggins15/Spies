@@ -86,13 +86,19 @@ h2{
   transition: .5s;
   background: transparent;
   border: none;
-  background-color: #333;
+  background-color: black;
   left: 0;
   right: 0;
   top: 0px;
-  text-align: right;
   padding: .2em;
+  text-align: right;
+}
+
+#arroundButton{
   width: 100%;
+  background-color: black;
+  float: right;
+
 }
 
 #account:hover, #signOut:hover{
