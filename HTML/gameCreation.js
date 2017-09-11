@@ -107,7 +107,7 @@ function joinGame(joinRoom){
   var input = $('#joinGameTextfield').val();
   var all = getJson();
   var room =all.users[user.uid].room;
-  if(room != null){
+  if(room != null && input == ""){
     input = room;
   }
   //not using listener proproties, this should just be called every time it runs

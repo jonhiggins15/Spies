@@ -9,12 +9,10 @@ auth.onAuthStateChanged(function(user) {
 
     all = getJson();
     room = all.users[user.uid].room;
-    console.log(room);
     if(room != null){
       $('#gameModal').modal('show');
       $('#currentRoom').append('<button id="modalJoin" onclick="joinGame()"></button>');
       $('#modalJoin').text(room);
-
     }
 
   } else {
@@ -27,35 +25,42 @@ $('#signInButton').click(function(){
     var email = $('#email').val();
     var password = $('#password').val();
     var hadError = false;
+
     if(email != "" && password != ""){
-      auth.signInWithEmailAndPassword(email, password).catch(function(error) {
+      auth.signInWithEmailAndPassword(email, password).then((user) => {
+        if(!hadError) success();
+      }).catch(function(error){
         hadError = true;
+        console.log(hadError);
         var errorCode = error.code;
         var errorMessage = error.message;
         $('#login-error').text(errorMessage);
-      });
-      if(!hadError){
-        $('#loginModal').modal('hide');
-      }
-    }
+    });
+  }
 });
+
+function success(){
+    $('#loginModal').modal('hide');
+    $('#login-error').text("");
+}
 
 $('#signUpButton').click(function(){
     var email = $('#emailForm').val();
     var password = $('#passwordForm').val();
     var name = $('#nameForm').val();
     var hadError = false;
+
     if(email != "" && password != ""){
-      auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
+      auth.createUserWithEmailAndPassword(email, password).then((user) => {
+        if(!hadError) success();
+      }).catch(function(error){
         hadError = true;
+        console.log(hadError);
         var errorCode = error.code;
         var errorMessage = error.message;
-        $('#signin-error').text(errorMessage);
-      });
-      if(!hadError){
-        $('#loginModal').modal('hide');
-      }
-    }
+        $('#login-error').text(errorMessage);
+    });
+  }
 });
 
 $('#create-account-link').click(function(){
