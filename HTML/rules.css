@@ -6,6 +6,17 @@ header{
   color : white;
 }
 
-body{
-  color: white;
+#body{
+  background-color: #222;
+  color: white
+}
+
+#Roles{
+  margin: 0px;
+}
+
+#panel{
+  background-color: transparent;
+  display: none;
+  margin: 0px;
 }

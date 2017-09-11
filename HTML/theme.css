@@ -60,14 +60,12 @@
   z-index: 2;
 }
 
-#account, #signOut{
+#account, #signOut, .navbar-right{
   color: white;
   transition: .5s;
   background: transparent;
   border: none;
   background-color: black;
-  left: 0;
-  right: 0;
   top: 0px;
   padding: .2em;
 }

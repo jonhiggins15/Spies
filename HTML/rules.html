@@ -2,8 +2,17 @@
 <html>
 
 <head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <meta charset="UTF-8">
   <title>The Rules</title>
+  <script>
+    $(document).ready(function(){
+      $('.Roles').click(function(e) {
+        $(this).next('div.panel').slideToggle('slow');
+      });
+    });
+  </script>
   <link rel="stylesheet" type="text/css" href="rules.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,500" rel="stylesheet">
@@ -14,5 +23,15 @@
   RULES
 </header>
 
+<body id="body">
+  <p class="Roles" id="Roles">Robber</p>
+  <div class="panel" id="panel">
+    <p>hello</p>
+  </div>
+  <p class="Roles" id="Roles">Spy</p>
+  <div class="panel" id="panel">
+    <p>xyz</p>
+  </div>
+</body>
 
 </html>
