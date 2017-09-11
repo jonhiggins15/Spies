@@ -27,12 +27,14 @@ input[type="checkbox"]:checked+label, input[type="radio"]:checked+label{
 }
 
 label{
+  display: inline-block;
   color: #ddca7e;
-  padding: 2em;
+  padding-top: 1.5em;
   border: 2px solid;
   list-style-position:inside;
-  display: inline-block;
-  width: 60px;
+  display: inline-grid;
+  width: 8em;
+  height: 4em;
   margin: 7px;
   font-family: 'Roboto', sans-serif;
 }

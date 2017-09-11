@@ -88,10 +88,13 @@ function findRole(){
         });
     }
   }
-  for(x in all.rooms[room].lastKill){
-    wasKilledLine = wasKilledLine + all.rooms[room].players[x].name + " ";
-    noDeaths = false;
+  if(all.rooms[room].players[x].name != null){
+    for(x in all.rooms[room].lastKill){
+      wasKilledLine = wasKilledLine + all.rooms[room].players[x].name + " ";
+      noDeaths = false;
+    }
   }
+
   if(!noDeaths){
     $('#lastKill').text(wasKilledLine);
   }
@@ -106,7 +109,7 @@ function findRole(){
     case "Hacker":
       hacker();
       break;
-    case "matchmaker":
+    case "Matchmaker":
       matchmaker();
       break;
     case "Bodyguard":
@@ -128,10 +131,16 @@ function burglar(){
   for (x in all.rooms[room].players) {
     if(all.rooms[room].players[x].isAlive == true){
       if(all.rooms[room].players[u.uid].steal == all.rooms[room].players[x].uid){
+        $('#names').append('<input type="radio" id="'
+        +all.rooms[room].players[x].uid +'" name="player" checked="true" onclick="burglarListener(this.value)" value='
+        + all.rooms[room].players[x].uid + '><label for='
+        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+"</label>");
         //makes the radio buttons pre-checked if currUser voted for that player
-        $('#names').append('<input type="radio" checked="true" name="player" onclick="burglarListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
       }else{
-        $('#names').append('<input type="radio" name="player" onclick="burglarListener(this.value)" value=' + all.rooms[room].players[x].uid + '>' + all.rooms[room].players[x].name);
+        $('#names').append('<input type="radio" id="'
+        +all.rooms[room].players[x].uid +'" name="player" checked="false" onclick="burglarListener(this.value)" value='
+        + all.rooms[room].players[x].uid + '><label for='
+        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+"</label>");
       }
     }
   }
@@ -218,27 +227,45 @@ function spy(){
       //see who the player voted for
       var currVote = all.rooms[room].players[u.uid].nightVote;
       if(currVote == all.rooms[room].players[x].uid){
+        if(all.rooms[room].players[x].role != "Spy"){
+          $('#names').append('<input type="radio" id="'
+          +all.rooms[room].players[x].uid +'" name="player" checked="true" onclick="spyVote(this.value)" value='
+          + all.rooms[room].players[x].uid +  '><label for='
+          +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+
+          ' '+votes+"</label>");
+        }else{
+          $('#names').append('<input type="radio" id="'
+          +all.rooms[room].players[x].uid +'" name="player" checked="true" onclick="spyVote(this.value)" value='
+          + all.rooms[room].players[x].uid + '><label for='
+          +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+
+          ' '+votes+" (spy)" +"</label>");
+        }
         //makes the radio buttons pre-checked if currUser voted for that player
-        $('#names').append('<input type="radio" id="'
-        +all.rooms[room].players[x].uid +'" name="player" checked="true" onclick="spyVote(this.value)" value='
-        + all.rooms[room].players[x].uid + '><label for='
-        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+
-        ' '+votes+"</label>");
+
       }else{
-        $('#names').append('<input type="radio" id="'
-        +all.rooms[room].players[x].uid +'" name="player" onclick="spyVote(this.value)" value='
-        + all.rooms[room].players[x].uid + '><label for='
-        +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+
-        ' '+votes+"</label>");
+        if(all.rooms[room].players[x].role != "Spy"){
+          $('#names').append('<input type="radio" id="'
+          +all.rooms[room].players[x].uid +'" name="player" onclick="spyVote(this.value)" value='
+          + all.rooms[room].players[x].uid + '><label for='
+          +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+
+          ' '+votes+"</label>");
+        }else{
+          $('#names').append('<input type="radio" id="'
+          +all.rooms[room].players[x].uid +'" name="player" onclick="spyVote(this.value)" value='
+          + all.rooms[room].players[x].uid + '><label for='
+          +all.rooms[room].players[x].uid+'>' + all.rooms[room].players[x].name+
+          ' '+votes+" (spy)" +"</label>");
+        }
+
       }
     }
   }
 }
 
-function toDay(){
-  isDay = true;
-  changeToDay();
-}
+// function toDay(){
+//   isDay = true;
+//   changeToDay();
+// }
 
 //makes a map with the uid as the key and the number of people who voted to
 //kill them as the value
@@ -263,8 +290,8 @@ function makeSpyList() {
 function changeToDay(){
   var all = getJson();
   var time = new Date();
-  // if (time.getHours() < 17 && time.getHours() > 5){
-  if (isDay){
+  if (time.getHours() < 17 && time.getHours() > 5){
+  // if (isDay){
     var spyList = makeSpyList();
     var killName;
     var votes = 0;
