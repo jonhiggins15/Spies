@@ -87,13 +87,14 @@ function findRole(){
           console.log("Remove failed: " + error.message)
         });
     }
-  }
-  if(all.rooms[room].players[x].name != null){
-    for(x in all.rooms[room].lastKill){
-      wasKilledLine = wasKilledLine + all.rooms[room].players[x].name + " ";
-      noDeaths = false;
+    if(all.rooms[room].players[x].name != null){
+      for(x in all.rooms[room].lastKill){
+        wasKilledLine = wasKilledLine + all.rooms[room].players[x].name + " ";
+        noDeaths = false;
+      }
     }
   }
+
 
   if(!noDeaths){
     $('#lastKill').text(wasKilledLine);
@@ -290,7 +291,7 @@ function makeSpyList() {
 function changeToDay(){
   var all = getJson();
   var time = new Date();
-  if (time.getHours() < 17 && time.getHours() > 5){
+  if (time.getHours() < 16 && time.getHours() > 5){
   // if (isDay){
     var spyList = makeSpyList();
     var killName;
