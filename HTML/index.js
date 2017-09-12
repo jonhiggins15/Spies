@@ -44,24 +44,24 @@ function success(){
     $('#login-error').text("");
 }
 
-$('#signUpButton').click(function(){
-    var email = $('#emailForm').val();
-    var password = $('#passwordForm').val();
-    var name = $('#nameForm').val();
-    var hadError = false;
-
-    if(email != "" && password != ""){
-      auth.createUserWithEmailAndPassword(email, password).then((user) => {
-        if(!hadError) success();
-      }).catch(function(error){
-        hadError = true;
-        console.log(hadError);
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        $('#login-error').text(errorMessage);
-    });
-  }
-});
+// $('#signUpButton').click(function(){
+//     var email = $('#emailForm').val();
+//     var password = $('#passwordForm').val();
+//     var name = $('#nameForm').val();
+//     var hadError = false;
+//
+//     if(email != "" && password != ""){
+//       auth.createUserWithEmailAndPassword(email, password).then((user) => {
+//         if(!hadError) success();
+//       }).catch(function(error){
+//         hadError = true;
+//         console.log(hadError);
+//         var errorCode = error.code;
+//         var errorMessage = error.message;
+//         $('#login-error').text(errorMessage);
+//     });
+//   }
+// });
 
 $('#create-account-link').click(function(){
   $('#login-error').text("");
