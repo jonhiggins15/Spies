@@ -312,7 +312,7 @@ function updateView(){
     startView();
   }else if (state == "ongoing") {
     var time = new Date();
-      if (time.getHours() > 17 || time.getHours() < 5) {
+      if (time.getHours() > 16 || time.getHours() < 5) {
       // if(isNight){
         //this means it's night
         var dict = {};
