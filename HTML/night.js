@@ -41,11 +41,13 @@ function checkActions(){
     if(all.rooms[room].players[x].isAlive == true){
       numPlayers.push(x);
       if(all.rooms[room].players[x].usedAbility == true){
-        counter++;
+        counter += 1;
       }
     }
   }
-  if(counter == numPlayers){
+  console.log(counter);
+  console.log(numPlayers);
+  if(counter == numPlayers.length){
     return true;
   }
 

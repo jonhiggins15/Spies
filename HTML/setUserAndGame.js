@@ -109,6 +109,24 @@ function makeUserList() {
   }
 }
 
+function checkIfVoted(){
+  var all = getJson();
+  var counter = 0;
+  var numPlayers = [];
+  for(x in all.rooms[room].players){
+    if(all.rooms[room].players[x].isAlive == true){
+      numPlayers.push(x);
+      if(all.rooms[room].players[x].dayKillVote != null){
+        counter += 1;
+      }
+    }
+  }
+  console.log(counter);
+  console.log(numPlayers);
+  if(counter == numPlayers.length){
+    return true;
+  }
+}
 //makes a map with the uid as the key and the number of people who voted to
 //kill them as the value
 function makeVoteList() {
@@ -312,7 +330,7 @@ function updateView(){
     startView();
   }else if (state == "ongoing") {
     var time = new Date();
-      if (time.getHours() > 16 || time.getHours() < 5) {
+      if (checkIfVoted()) {
       // if(isNight){
         //this means it's night
         var dict = {};
