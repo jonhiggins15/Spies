@@ -32,6 +32,25 @@ function die(){
   window.location.assign("death.html");
 }
 
+function checkActions(){
+  var all = getJson();
+  var numPlayers = [];
+  var counter = 0;
+
+  for(x in all.rooms[room].players){
+    if(all.rooms[room].players[x].isAlive == true){
+      numPlayers.push(x);
+      if(all.rooms[room].players[x].usedAbility == true){
+        counter++;
+      }
+    }
+  }
+  if(counter == numPlayers){
+    return true;
+  }
+
+}
+
 //uses REST API to return the json file with all of firebase in it
 function getJson(){
   var xhttp = new XMLHttpRequest();
@@ -291,8 +310,7 @@ function makeSpyList() {
 function changeToDay(){
   var all = getJson();
   var time = new Date();
-  if (time.getHours() < 16 && time.getHours() > 5){
-  // if (isDay){
+  if (checkActions()){
     var spyList = makeSpyList();
     var killName;
     var votes = 0;
