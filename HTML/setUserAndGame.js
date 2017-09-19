@@ -116,7 +116,7 @@ function checkIfVoted(){
   for(x in all.rooms[room].players){
     if(all.rooms[room].players[x].isAlive == true){
       numPlayers.push(x);
-      if(all.rooms[room].players[x].dayKillVote != null){
+      if(all.rooms[room].players[x].dayKillVote != ""){
         counter += 1;
       }
     }

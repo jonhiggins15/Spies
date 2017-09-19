@@ -32,7 +32,6 @@ $('#signInButton').click(function(){
         if(!hadError) success();
       }).catch(function(error){
         hadError = true;
-        console.log(hadError);
         var errorCode = error.code;
         var errorMessage = error.message;
         $('#login-error').text(errorMessage);
@@ -56,7 +55,6 @@ $('#signUpButton').click(function(){
         if(!hadError) success();
       }).catch(function(error){
         hadError = true;
-        console.log(hadError);
         var errorCode = error.code;
         var errorMessage = error.message;
         $('#login-error').text(errorMessage);

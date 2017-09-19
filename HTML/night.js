@@ -89,6 +89,8 @@ function checkEndGame(){
   }else if(spyNum == 0){
     window.location.assign('endGame.html');
   }
+  changeToDay();
+
 }
 
 function findRole(){
@@ -310,8 +312,8 @@ function makeSpyList() {
 }
 
 function changeToDay(){
+  console.log("hello");
   var all = getJson();
-  var time = new Date();
   if (checkActions()){
     var spyList = makeSpyList();
     var killName;
@@ -360,6 +362,7 @@ function changeToDay(){
       }
       firebase.database().ref('rooms/'+room+'/players/'+u.uid).update({
         guarded: false
+        dayKillVote: ""
       });
       window.location.assign('main.html');
     }
